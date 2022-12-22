@@ -25,13 +25,11 @@ Texture2D BackgroundImageTexture;
 Image BackgroundImage;
 Image WindowIcon;
 
-Color TERMINALBROWN = { 99, 59, 7, 255 };
-Color TERMINALOUTLINEYELLOW = { 119, 91, 19, 255 };
+Color TERMINALBROWN = {99, 59, 7, 255};
+Color TERMINALOUTLINEYELLOW = {119, 91, 19, 255};
 
-
-int WindowWidth = 1920;
-int WindowHeight = 1080;
-
+int WindowWidth = 1600;
+int WindowHeight = 900;
 
 float MainMenuButtonWidth = 400;
 float MainMenuButtonHeight = 50;
