@@ -2,17 +2,17 @@ bool CollisionWithFloor = false, CollisionWithBoundary = false, isBallCollidedWi
 
 Camera camera;
 
-Model model;
+Model wallCube, ball;
 
 Mesh ModelMesh;
 
 Vector3 BallPosition, FloorPosition, FloorSize, CubePosition, CubeSize;
-float BallRadius = 0.4f;
+float BallRadius = 0.5f;
 Vector3 BallSpeedVector;
 
-BoundingBox FloorBoundingBox, CubeBoundingBox;
+BoundingBox FloorBoundingBox, CubeBoundingBox, ballBoundingBox;
 
-Rectangle ExitButton, InputButton, SettingsButton, ScoreBoard, PlayButton;
+Rectangle ExitButton, InputButton, SettingsButton, ScoreBoard, PlayButton, ballRectangle, wallRectangle, collision;
 
 Font HelloHeadline;
 
@@ -20,9 +20,8 @@ Music GladosMusicSelectionVoice;
 
 Vector2 vect;
 
-Texture2D BackgroundImageTexture;
+Texture2D wallTexture, ballTexture;
 
-Image BackgroundImage;
 Image WindowIcon;
 
 Color TERMINALBROWN = {99, 59, 7, 255};
@@ -43,3 +42,8 @@ int layers = 2;
 
 int delayFrame = 0;
 int delay = 3;
+
+float difX = 0;
+float difZ = 0;
+bool collidedWithX = false;
+bool collidedWithY = false;

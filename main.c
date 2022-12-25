@@ -15,7 +15,6 @@ int main()
 
 	InitWindow(WindowWidth, WindowHeight, "Interactive Maze");
 	InitAudioDevice();
-
 	WindowIcon = LoadImage("resources/icon.png");
 
 	ImageFormat(&WindowIcon, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
@@ -26,7 +25,12 @@ int main()
 
 	// SplashScreen();
 
-	model = LoadModel("resources/levels/level1_border.obj");
+	wallCube = LoadModel("Wall.obj");
+	wallTexture = LoadTexture("Wall.png");
+	wallCube.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = wallTexture;
+
+	ball = LoadModel("Ball.obj");
+	ballBoundingBox = GetModelBoundingBox(ball);
 
 	while (!WindowShouldClose())
 	{ // Replace later with should exit
@@ -41,30 +45,18 @@ int main()
 			WindowHeight = GetScreenHeight();
 		}
 
-		// switch (layers)
-		// {
-		// case 0:
-		// 	InputSelection();
-		// 	break;
-		// case 1:
-		// 	MainMenu();
-		// 	break;
-		// case 2:
-		// 	Level1();
-		// 	break;
-		// }
-
-		BeginDrawing();
-		ClearBackground(BLACK);
-		DrawText(TextFormat("%d", IsGamepadAvailable(1)), 20, 400, 25, WHITE);
-		DrawText(GetGamepadName(1), 20, 500, 25, WHITE);
-		DrawText(TextFormat("%d", GetGamepadAxisCount(1)), 20, 600, 25, WHITE);
-		for (size_t i = 0; i < 6; i++)
+		switch (layers)
 		{
-			DrawText(TextFormat("%f", GetGamepadAxisMovement(1, i)), 20, 20 * i, 25, WHITE);
+		case 0:
+			InputSelection();
+			break;
+		case 1:
+			MainMenu();
+			break;
+		case 2:
+			Level1();
+			break;
 		}
-
-		EndDrawing();
 	}
 
 	CloseAudioDevice();
@@ -81,8 +73,6 @@ void SplashScreen()
 
 	Image IntroLogo = LoadImageAnim("resources/IntroLogo.gif", &animFrames);
 	Texture2D IntroLogoTexture = LoadTextureFromImage(IntroLogo);
-	BackgroundImage = LoadImage("resources/BackgroundImage.png");
-	BackgroundImageTexture = LoadTextureFromImage(BackgroundImage);
 
 	unsigned int nextFrameDataOffset = 0;
 	int currentAnimatedFrame = 0;
@@ -228,14 +218,14 @@ void Level1()
 		// Define the camera to look into our 3d world
 		camera.fovy = 70.0;
 		camera.projection = 0;
-		camera.position = (Vector3){-0.002371f, 30.0f, 49.558060f};
+		camera.position = (Vector3){-0.002371f, 15.0f, 43.558060f};
 		camera.target = (Vector3){-0.091722f, 11.853745f, 39.693504f};
 		camera.up = (Vector3){0.0f, 10.0f, 0.0f};
 
 		FloorPosition = (Vector3){0.0f, -10.0f, 0.0f};
 		FloorSize = (Vector3){80.0f, 1.0f, 80.0f};
 
-		CubePosition = (Vector3){-39.0f, -9.0f, -39.0f};
+		CubePosition = (Vector3){-39.0f, -8.0f, -39.0f};
 		CubeSize = (Vector3){2.0f, 2.0f, 2.0f};
 
 		BallPosition = (Vector3){0.0f, 10.0f, 0.0f}; // Set model position     // Unload cubesmap image from RAM, already uploaded to VRAM
@@ -278,17 +268,15 @@ void Level1()
 	{
 	}
 
-	BallSpeedVector.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X) / 4;
+	BallSpeedVector.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X) * GetFrameTime() * 10;
+	BallSpeedVector.z += GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y) * GetFrameTime() * 10;
+
 	BallPosition.x += BallSpeedVector.x;
 
-	BallSpeedVector.z += GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y) / 4;
 	BallPosition.z += BallSpeedVector.z;
 
-	if (IsKeyDown(KEY_T))
-	{
-		camera.target = (Vector3){camera.target.x + 1, camera.target.y, camera.target.z};
-	}
-
+	collidedWithX = false;
+	collidedWithY = false;
 	// CheckCollisionBoxSphere();
 	UpdateCamera(&camera);
 	//----------------------------------------------------------------------------------
@@ -317,30 +305,60 @@ void Level1()
 			{
 				if (level1[i][j])
 				{
-					DrawCubeV((Vector3){CubePosition.x + 2 * i, CubePosition.y, CubePosition.z + 2 * j}, CubeSize, TERMINALBROWN);
-					DrawCubeWiresV((Vector3){CubePosition.x + 2 * i, CubePosition.y, CubePosition.z + 2 * j}, CubeSize, TERMINALOUTLINEYELLOW);
+					DrawModel(wallCube, (Vector3){CubePosition.x + 2 * i, CubePosition.y - 1, (CubePosition.z + 2 * j) - 1}, 2.0f, WHITE);
 					if (CheckCollisionBoxSphere((BoundingBox){(Vector3){CubePosition.x + 2 * i - CubeSize.x / 2,
 																		CubePosition.y - CubeSize.y / 2,
 																		CubePosition.z + 2 * j - CubeSize.z / 2},
 															  (Vector3){CubePosition.x + 2 * i + CubeSize.x / 2,
 																		CubePosition.y + CubeSize.y / 2,
 																		CubePosition.z + 2 * j + CubeSize.z / 2}},
-												(Vector3){BallPosition.x, BallPosition.y + 0.5, BallPosition.z}, BallRadius))
+												(Vector3){BallPosition.x, BallPosition.y, BallPosition.z}, BallRadius))
 					{
+						ballRectangle = (Rectangle){
+							BallPosition.x - BallRadius,
+							BallPosition.z - BallRadius,
+							BallPosition.x + BallRadius,
+							BallPosition.z + BallRadius};
 
-						BallPosition.x -= BallSpeedVector.x;
-						BallPosition.z -= BallSpeedVector.z;
+						wallRectangle = (Rectangle){CubePosition.x + 2 * i - CubeSize.x / 2, CubePosition.z + 2 * j - CubeSize.z / 2, CubePosition.x + 2 * i + CubeSize.x / 2, CubePosition.z + 2 * j + CubeSize.z / 2};
+
+						collision = GetCollisionRec(ballRectangle, wallRectangle);
+
+						// Use the position and dimensions of the collision rectangle
+						// to determine the direction of the collision
+						if (collision.x > ballRectangle.x)
+						{
+							BallPosition.x -= BallSpeedVector.x;
+						}
+						else if (collision.x + collision.width < ballRectangle.x + ballRectangle.width)
+						{
+							BallPosition.x -= BallSpeedVector.x;
+						}
+						else if (collision.y > ballRectangle.y)
+						{
+							BallPosition.z -= BallSpeedVector.z;
+						}
+						else if (collision.y + collision.height < ballRectangle.y + ballRectangle.height)
+						{
+							BallPosition.z -= BallSpeedVector.z;
+						}
+						else
+						{
+							// Collision from the front or back
+						}
 					}
 				}
 			}
 		}
-
-		DrawSphere((Vector3){BallPosition.x, BallPosition.y + 0.5, BallPosition.z}, BallRadius, RED);
-		DrawSphereWires((Vector3){BallPosition.x, BallPosition.y + 0.5, BallPosition.z}, BallRadius + 0.01, 10, 10, BLACK);
-
+		DrawModel(ball, (Vector3){BallPosition.x, BallPosition.y + 0.5, BallPosition.z}, 1.0, ORANGE);
+		DrawModelWires(ball, (Vector3){BallPosition.x, BallPosition.y + 0.5, BallPosition.z}, 1.0, BLACK);
+		DrawText(TextFormat("%f", difX), 100, 100, 15, BLACK);
+		DrawText(TextFormat("%f", difZ), 120, 120, 15, BLACK);
 		EndMode3D();
 
 		DrawRectangleLinesEx((Rectangle){spacing, spacing, WindowWidth - 2 * spacing, WindowHeight - 2 * spacing}, 10, TERMINALOUTLINEYELLOW);
+		DrawRectangleLinesEx((Rectangle){0, 0, WindowWidth, WindowHeight}, 20, TERMINALBROWN);
+		DrawFPS(1, 1);
 		EndDrawing();
 	}
 }
