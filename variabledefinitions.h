@@ -7,7 +7,7 @@ Model wallCube, ball;
 Mesh ModelMesh;
 
 Vector3 BallPosition, FloorPosition, FloorSize, CubePosition, CubeSize;
-float BallRadius = 0.5f;
+float ballRadius = 0.5f;
 Vector3 BallSpeedVector;
 
 BoundingBox FloorBoundingBox, CubeBoundingBox, ballBoundingBox;
