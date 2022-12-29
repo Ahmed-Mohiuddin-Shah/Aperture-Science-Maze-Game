@@ -10,6 +10,9 @@
 	},
 	"files.associations": {
 		"raymath.h": "c",
-		"functional": "c"
+		"functional": "c",
+		"maze.h": "c",
+		"functions.h": "c",
+		"variabledefinitions.h": "c"
 	}
 }

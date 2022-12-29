@@ -1,49 +1,39 @@
-bool CollisionWithFloor = false, CollisionWithBoundary = false, isBallCollidedWithWall = false;
+#define RectCount 40
 
-Camera camera;
+const int screenWidth = 1600;
+const int screenHeight = 900;
 
-Model wallCube, ball;
+unsigned int FPS = 120;
+unsigned int layer = 0;
+unsigned int cursorBlinkCounter = 0;
+bool cursorVisible = true;
+float elapsedTime = 0.0f;
+float blinkInterval = 0.5f;
 
-Mesh ModelMesh;
+char titleText[] = "Aperture Science Maze Testing Initiative";
+char titleTextASCII[] = "Maze Testing\nInitiative";
 
-Vector3 BallPosition, FloorPosition, FloorSize, CubePosition, CubeSize;
-float ballRadius = 0.5f;
-Vector3 BallSpeedVector;
+float Radius = 1.0;
 
-BoundingBox FloorBoundingBox, CubeBoundingBox, ballBoundingBox;
+bool shouldDrawFPS = false;
 
-Rectangle ExitButton, InputButton, SettingsButton, ScoreBoard, PlayButton, ballRectangle, wallRectangle, collision;
+Rectangle rectanglesOfLevel1[RectCount][RectCount] = {};
 
-Font HelloHeadline;
+Camera worldCamera = {0};
 
-Music GladosMusicSelectionVoice;
+Model wallCube, floorModel;
 
-Vector2 vect;
+Texture2D wallTexture;
 
-Texture2D wallTexture, ballTexture;
+Vector2 newPosOrigin;
+Vector2 PlayerOrigin = {0, 0};
 
-Image WindowIcon;
+Vector3 ballPosition = {0, 2.5, 0};
+
+Font consolasFont;
 
 Color TERMINALBROWN = {99, 59, 7, 255};
-Color TERMINALOUTLINEYELLOW = {119, 91, 19, 255};
+Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
+Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 
-int WindowWidth = 1600;
-int WindowHeight = 900;
-
-float MainMenuButtonWidth = 400;
-float MainMenuButtonHeight = 50;
-float spacing = 20;
-float FPS = 120.0;
-
-float gravity;
-
-int shouldExit = 0;
-int layers = 2;
-
-int delayFrame = 0;
-int delay = 3;
-
-float difX = 0;
-float difZ = 0;
-bool collidedWithX = false;
-bool collidedWithY = false;
+Sound menuOptionsSound;

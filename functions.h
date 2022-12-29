@@ -61,3 +61,160 @@ void PointNearestRectanglePoint(Rectangle rect, Vector2 point, Vector2 *nearest,
         }
     }
 }
+
+void drawBlinkingCursor(float x, float y)
+{
+    elapsedTime += GetFrameTime();
+    if (elapsedTime > blinkInterval)
+    {
+        elapsedTime = 0.0f;
+        cursorVisible = !cursorVisible;
+    }
+    if (cursorVisible)
+    {
+        DrawTextEx(consolasFont, "_", (Vector2){x, y}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    }
+}
+
+void drawConsoleOverlay()
+{
+    DrawRectangleLinesEx((Rectangle){30, 20, screenWidth - 60, screenHeight - 40}, 5.0f, TERMINALOUTLINEYELLOW);
+    DrawRectangleLinesEx((Rectangle){0, 0, screenWidth, screenHeight}, 20.0f, TERMINALBROWN);
+    DrawRectangleRec((Rectangle){0, 0, 30, screenHeight}, TERMINALBROWN);
+    DrawRectangleRec((Rectangle){screenWidth - 30, 0, 30, screenHeight}, TERMINALBROWN);
+    DrawRectangleRec((Rectangle){screenWidth - 210, 12, 160, 160}, TERMINALBROWN);
+    DrawRectangleLinesEx((Rectangle){screenWidth - 210, 12, 160, 160}, 5.0f, TERMINALOUTLINEYELLOW);
+    DrawRectangleRec((Rectangle){screenWidth - 300, 12, 80, 160}, TERMINALBROWN);
+    DrawRectangleLinesEx((Rectangle){screenWidth - 300, 12, 80, 160}, 5.0f, TERMINALOUTLINEYELLOW);
+    DrawRectangleRec((Rectangle){screenWidth - 470, 12, 160, 160}, TERMINALBROWN);
+    DrawRectangleLinesEx((Rectangle){screenWidth - 470, 12, 160, 160}, 5.0f, TERMINALOUTLINEYELLOW);
+    if (shouldDrawFPS)
+        DrawFPS(1, 1);
+    DrawTextEx(consolasFont, "192.\n168.\n18.\n01", (Vector2){screenWidth - 290, 25}, 25, 0.5, TERMINALTEXTGOLD);
+}
+
+void drawMap()
+{
+    for (int i = 0; i < RectCount; i++)
+    {
+        for (int j = 0; j < 40; j++)
+        {
+            if (level1[i][j])
+            {
+                DrawRectangleRec((Rectangle){rectanglesOfLevel1[i][j].x + screenWidth - 470, rectanglesOfLevel1[i][j].y + 12, rectanglesOfLevel1[i][j].width, rectanglesOfLevel1[i][j].height}, TERMINALOUTLINEYELLOW);
+            }
+        }
+    }
+    DrawCircle(PlayerOrigin.x + screenWidth - 470, PlayerOrigin.y + 12, Radius * 3, TERMINALTEXTGOLD);
+}
+
+void mainMenu()
+{
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    DrawTextEx(consolasFont, titleTextASCII, (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+
+    DrawTextEx(consolasFont, "Play", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 240, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Exit", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    drawBlinkingCursor(120, screenHeight - 140);
+
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 120, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = 1;
+    }
+
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
+void settingsMenu()
+{
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+
+    DrawTextEx(consolasFont, titleTextASCII, (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
+void level_1()
+{
+    ballPosition.x = PlayerOrigin.x;
+    ballPosition.z = PlayerOrigin.y;
+    worldCamera.target = (Vector3){ballPosition.x, ballPosition.y, ballPosition.z - 25};
+    worldCamera.position = (Vector3){ballPosition.x, ballPosition.y - 10, ballPosition.z};
+    newPosOrigin = PlayerOrigin;
+
+    if (IsKeyDown(KEY_UP))
+        newPosOrigin.y -= 20 * GetFrameTime();
+
+    if (IsKeyDown(KEY_DOWN))
+        newPosOrigin.y += 20 * GetFrameTime();
+
+    if (IsKeyDown(KEY_RIGHT))
+        newPosOrigin.x += 20 * GetFrameTime();
+
+    if (IsKeyDown(KEY_LEFT))
+        newPosOrigin.x -= 20 * GetFrameTime();
+
+    for (int i = 0; i < RectCount; i++)
+    {
+        for (int j = 0; j < RectCount; j++)
+        {
+            Vector2 hitPoint = {-100, -100};
+            Vector2 hitNormal = {0, 0};
+            PointNearestRectanglePoint(rectanglesOfLevel1[i][j], newPosOrigin, &hitPoint, &hitNormal);
+
+            Vector2 vectorToHit = Vector2Subtract(hitPoint, newPosOrigin);
+
+            bool inside = Vector2LengthSqr(vectorToHit) < Radius * Radius;
+
+            if (inside)
+            {
+
+                // normalize the vector along the point to where we are nearest
+                vectorToHit = Vector2Normalize(vectorToHit);
+
+                // project that out to the radius to find the point that should be 'deepest' into the rectangle.
+                Vector2 projectedPoint = Vector2Add(newPosOrigin, Vector2Scale(vectorToHit, Radius));
+
+                // compute the shift to take the deepest point out to the edge of our nearest hit, based on the vector direction
+                Vector2 delta = {0, 0};
+
+                if (hitNormal.x != 0)
+                    delta.x = hitPoint.x - projectedPoint.x;
+                else
+                    delta.y = hitPoint.y - projectedPoint.y;
+
+                // shift the new point by the delta to push us outside of the rectangle
+                newPosOrigin = Vector2Add(newPosOrigin, delta);
+            }
+        }
+    }
+
+    PlayerOrigin = newPosOrigin;
+    UpdateCamera(&worldCamera);
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    BeginMode3D(worldCamera);
+    DrawModelEx(
+        floorModel, (Vector3){80.0, 0.0, 80.0}, (Vector3){1.0, 0.0, 0.0}, 90, (Vector3){4.0, 4.0, 0.0}, WHITE);
+    DrawSphere(ballPosition, Radius, ORANGE);
+    for (int i = 0; i < RectCount; i++)
+    {
+        for (int j = 0; j < 40; j++)
+        {
+            if (level1[i][j])
+            {
+                DrawModel(wallCube, (Vector3){rectanglesOfLevel1[i][j].x + rectanglesOfLevel1[i][j].width / 2, 2, rectanglesOfLevel1[i][j].y}, 4.0, WHITE);
+            }
+        }
+    }
+    EndMode3D();
+
+    drawConsoleOverlay();
+    drawMap();
+    EndDrawing();
+}
