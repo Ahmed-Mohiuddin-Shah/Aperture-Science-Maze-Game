@@ -1,3 +1,7 @@
+void loadLevel(bool *level, unsigned int currentLevel)
+{
+}
+
 void PointNearestRectanglePoint(Rectangle rect, Vector2 point, Vector2 *nearest, Vector2 *normal)
 {
     // get the closest point on the vertical sides
@@ -91,6 +95,10 @@ void drawConsoleOverlay()
     if (shouldDrawFPS)
         DrawFPS(1, 1);
     DrawTextEx(consolasFont, "192.\n168.\n18.\n01", (Vector2){screenWidth - 290, 25}, 25, 0.5, TERMINALTEXTGOLD);
+    BeginShaderMode(scanlineShader);
+    // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
+    DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)-target.texture.height}, (Vector2){0, 0}, WHITE);
+    EndShaderMode();
 }
 
 void drawMap()
@@ -99,7 +107,7 @@ void drawMap()
     {
         for (int j = 0; j < 40; j++)
         {
-            if (level1[i][j])
+            if (level[i][j])
             {
                 DrawRectangleRec((Rectangle){rectanglesOfLevel1[i][j].x + screenWidth - 470, rectanglesOfLevel1[i][j].y + 12, rectanglesOfLevel1[i][j].width, rectanglesOfLevel1[i][j].height}, TERMINALOUTLINEYELLOW);
             }
@@ -196,9 +204,8 @@ void level_1()
 
     PlayerOrigin = newPosOrigin;
     UpdateCamera(&worldCamera);
-    BeginDrawing();
-    ClearBackground(TERMINALBROWN);
     BeginMode3D(worldCamera);
+    ClearBackground(TERMINALBROWN);
     DrawModelEx(
         floorModel, (Vector3){80.0, 0.0, 80.0}, (Vector3){1.0, 0.0, 0.0}, 90, (Vector3){4.0, 4.0, 0.0}, WHITE);
     DrawSphere(ballPosition, Radius, ORANGE);
@@ -206,14 +213,14 @@ void level_1()
     {
         for (int j = 0; j < 40; j++)
         {
-            if (level1[i][j])
+            if (level[i][j])
             {
                 DrawModel(wallCube, (Vector3){rectanglesOfLevel1[i][j].x + rectanglesOfLevel1[i][j].width / 2, 2, rectanglesOfLevel1[i][j].y}, 4.0, WHITE);
             }
         }
     }
     EndMode3D();
-
+    BeginDrawing();
     drawConsoleOverlay();
     drawMap();
     EndDrawing();

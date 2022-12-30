@@ -19,13 +19,17 @@ int main(void)
 	worldCamera.fovy = 70.0f;
 	worldCamera.projection = CAMERA_PERSPECTIVE;
 
+	target = LoadRenderTexture(screenWidth, screenHeight);
+
 	SetCameraMode(worldCamera, CAMERA_FREE);
+
+	scanlineShader = LoadShader(0, "resources/scanlines.fs");
 
 	for (int i = 0; i < RectCount; i++)
 	{
 		for (int j = 0; j < RectCount; j++)
 		{
-			if (level1[i][j])
+			if (level[i][j])
 			{
 				rectanglesOfLevel1[i][j] = (Rectangle){i * 4, j * 4, 4, 4};
 			}
@@ -52,6 +56,9 @@ int main(void)
 			break;
 		}
 	}
+	UnloadShader(scanlineShader);
+	UnloadModel(wallCube);
+	UnloadModel(floorModel);
 	CloseWindow();
 
 	return 0;

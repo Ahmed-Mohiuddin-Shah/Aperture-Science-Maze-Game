@@ -1,3 +1,4 @@
+
 #define RectCount 40
 
 const int screenWidth = 1600;
@@ -24,6 +25,9 @@ Camera worldCamera = {0};
 Model wallCube, floorModel;
 
 Texture2D wallTexture;
+RenderTexture2D target;
+
+Shader scanlineShader;
 
 Vector2 newPosOrigin;
 Vector2 PlayerOrigin = {0, 0};
