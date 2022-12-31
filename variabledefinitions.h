@@ -6,6 +6,8 @@ const int screenHeight = 900;
 
 unsigned int FPS = 120;
 unsigned int layer = 0;
+unsigned int previousLayer = 0;
+unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
 bool cursorVisible = true;
 float elapsedTime = 0.0f;
@@ -17,14 +19,21 @@ char titleTextASCII[] = "Maze Testing\nInitiative";
 float Radius = 1.0;
 
 bool shouldDrawFPS = false;
+bool shouldExit = false;
+bool shouldPause = false;
 
-Rectangle rectanglesOfLevel1[RectCount][RectCount] = {};
+Rectangle rectanglesOfLevel[RectCount][RectCount] = {};
 
 Camera worldCamera = {0};
 
-Model wallCube, floorModel;
+Model wallCube, floorModel, ballModel;
 
-Texture2D wallTexture;
+float swap;
+
+BoundingBox floorBoundingBox, ballBoundingBox, endGateBoundingBox;
+
+Texture2D wallTexture, ApertureScienceLogoForConsole;
+
 RenderTexture2D target;
 
 Shader scanlineShader;
@@ -41,3 +50,12 @@ Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 
 Sound menuOptionsSound;
+
+enum LAYERS
+{
+    MAIN_MENU,
+    LEVEL,
+    SETTINGS,
+    PAUSED,
+    WON_SCREEN
+};

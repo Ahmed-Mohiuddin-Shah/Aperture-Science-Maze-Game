@@ -13,6 +13,7 @@
 		"functional": "c",
 		"maze.h": "c",
 		"functions.h": "c",
-		"variabledefinitions.h": "c"
+		"variabledefinitions.h": "c",
+		"system_error": "c"
 	}
 }

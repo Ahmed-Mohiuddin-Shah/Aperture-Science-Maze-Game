@@ -21,42 +21,48 @@ int main(void)
 
 	target = LoadRenderTexture(screenWidth, screenHeight);
 
-	SetCameraMode(worldCamera, CAMERA_FREE);
+	SetCameraMode(worldCamera, CAMERA_PERSPECTIVE);
 
 	scanlineShader = LoadShader(0, "resources/scanlines.fs");
 
-	for (int i = 0; i < RectCount; i++)
-	{
-		for (int j = 0; j < RectCount; j++)
-		{
-			if (level[i][j])
-			{
-				rectanglesOfLevel1[i][j] = (Rectangle){i * 4, j * 4, 4, 4};
-			}
-		}
-	}
+	loadLevel(currentLevel);
 
 	wallCube = LoadModel("Wall.obj");
 	wallTexture = LoadTexture("Wall.png");
 	wallCube.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = wallTexture;
+
+	ballModel = LoadModel("Ball.obj");
+
 	floorModel = LoadModel("Floor.obj");
+	floorBoundingBox.min = (Vector3){0.0, 0.0, 0.0};
+	floorBoundingBox.max = (Vector3){160.0, 2.0, 160.0};
+
+	endGateBoundingBox.min = (Vector3){152.0, -4.0, 152.0};
+	endGateBoundingBox.max = (Vector3){156.0, 4.0, 156.0};
 
 	SetTargetFPS(FPS);
 
 	// Main game loop
-	while (!WindowShouldClose()) // Detect window close button or ESC key
+	while (!shouldExit && !WindowShouldClose()) // Detect window close button or ESC key or if Exit is pressed
 	{
 		switch (layer)
 		{
-		case 0:
+		case MAIN_MENU:
 			mainMenu();
 			break;
-		case 1:
-			level_1();
+		case LEVEL:
+			level();
+			break;
+		case SETTINGS:
+			settingsMenu();
+			break;
+		case PAUSED:
+			paused();
 			break;
 		}
 	}
 	UnloadShader(scanlineShader);
+	UnloadModel(ballModel);
 	UnloadModel(wallCube);
 	UnloadModel(floorModel);
 	CloseWindow();
