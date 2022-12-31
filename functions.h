@@ -177,7 +177,10 @@ void mainMenu()
     if (CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 280, 120, 50} : (Rectangle){45, screenHeight - 280, 210, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            HideCursor();
             layer = LEVEL;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 240, 50}))
     {
@@ -271,7 +274,10 @@ void nextLevel()
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 210, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            HideCursor();
             layer = LEVEL;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
     {
@@ -329,6 +335,7 @@ void level()
 {
     if (IsKeyPressed(KEY_P))
     {
+        ShowCursor();
         layer = PAUSED;
     }
     ballPosition.x = PlayerOrigin.x;
@@ -404,6 +411,7 @@ void level()
 
     if (CheckCollisionBoxSphere(endGateBoundingBox, ballPosition, Radius))
     {
+        ShowCursor();
         currentLevel++;
         if (currentLevel < LEVEL_COUNT)
         {
@@ -458,7 +466,10 @@ void paused()
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 170, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            HideCursor();
             layer = LEVEL;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
     {
