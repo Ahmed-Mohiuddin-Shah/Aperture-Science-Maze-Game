@@ -107,6 +107,10 @@ void drawBlinkingCursor(float x, float y)
     if (cursorVisible)
     {
         DrawTextEx(consolasFont, "_", (Vector2){x, y}, 50, 0.5, TERMINALTEXTGOLD);
+        if (layer == CREDITS)
+        {
+            creditsHeight--;
+        }
     }
 }
 
@@ -169,12 +173,13 @@ void mainMenu()
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, titleTextASCII, (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
-    DrawTextEx(consolasFont, TextFormat("%s", currentLevel == 0 ? "Play" : "Continue"), (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 280, 120, 50} : (Rectangle){45, screenHeight - 280, 210, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 240, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("%s", currentLevel == 0 ? "Play" : "Continue"), (Vector2){45, screenHeight - 350}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 350, 120, 50} : (Rectangle){45, screenHeight - 350, 210, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Credits", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 200, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 215, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, "Exit", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(160, screenHeight - 140);
 
-    if (CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 280, 120, 50} : (Rectangle){45, screenHeight - 280, 210, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 350, 120, 50} : (Rectangle){45, screenHeight - 350, 210, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -182,7 +187,17 @@ void mainMenu()
             layer = LEVEL;
         }
     }
-    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 240, 50}))
+
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 200, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            creditsHeight = screenHeight - 140;
+            layer = CREDITS;
+        }
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 215, 210, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -311,7 +326,10 @@ void winningScreen()
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 190, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            creditsHeight = screenHeight - 140;
             layer = CREDITS;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
     {
@@ -493,15 +511,24 @@ void creditScreen()
 {
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
-    DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
+    DrawTextEx(consolasFont, "President:\tAhmed Mohiuddin Shah\nCEO:\tAhmed Mohiuddin Shah\nCOO:\tAhmed Mohiuddin Shah\nProducer:\tAhmed Mohiuddin Shah\n\n\nGame/Development Director:\tAhmed Mohiuddin Shah\nProject Leader/Manage:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nOriginal Concept/Idea:\tAhmed Mohiuddin Shah\nDesign Director:\tAhmed Mohiuddin Shah\n\n\nResearch:\tAhmed Mohiuddin Shah\nGame Design:\tAhmed Mohiuddin Shah\nPlanning:\tAhmed Mohiuddin Shah\nProgrammer:\tAhmed Mohiuddin Shah\nEngineer:\tAhmed Mohiuddin Shah\nRendering:\tAhmed Mohiuddin Shah\nPhysics:\tAhmed Mohiuddin Shah\n\n\nBased on story from:\tPortal Series By Valve\n\n\n2D/3D Artist:\tAhmed Mohiuddin Shah\nUI Artist/Graphics:\tAhmed Mohiuddin Shah\nMenu/HUD Graphics:\tAhmed Mohiuddin Shah\nArt Director:\tAhmed Mohiuddin Shah\nVisuals:\tAhmed Mohiuddin Shah\nInterface:\tAhmed Mohiuddin Shah\nConcept:\tAhmed Mohiuddin Shah\nArt:\tAhmed Mohiuddin Shah\nCharacter Design:\tAhmed Mohiuddin Shah\nStoryboard:\tAhmed Mohiuddin Shah\nIllustrationts:\tAhmed Mohiuddin Shah\nModeler:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nEnvironment:\tAhmed Mohiuddin Shah\n\n\nQA Manager:\tAhmed Mohiuddin Shah\nQA Team:\tMy Fellow Hostelites\nPlaytesting Tester:\tAmaan\nPlaytesting Tester:\tAbubakar\nPlaytesting Tester:\tHannan\nPlaytesting Tester:\tHamza\nPlaytesting Tester:\tHaider\n\n\nSpecial Thanks:\tRaysan\nSpecial Thanks:\tSir Jaudat\nSpecial Thanks:\tHamza\nSpecial Thanks:\tMy Parents\n\n\n\nMADE WITH RAYLIB", (Vector2){45, creditsHeight}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawRectangle(0, 0, screenWidth, 120, TERMINALBROWN);
+    DrawRectangle(0, screenHeight - 150, screenWidth, screenHeight, TERMINALBROWN);
+    DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(310, screenHeight - 140);
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            creditsHeight = screenHeight - 140;
             layer = MAIN_MENU;
+        }
+    }
+    if (creditsHeight < -4200)
+    {
+        creditsHeight = screenHeight - 140;
     }
     drawConsoleOverlay();
     EndDrawing();

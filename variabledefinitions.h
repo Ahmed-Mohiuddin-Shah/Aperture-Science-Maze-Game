@@ -1,15 +1,29 @@
 
 #define RectCount 40
+enum LAYERS
+{
+    MAIN_MENU,
+    LEVEL,
+    SETTINGS,
+    PAUSED,
+    WON_SCREEN,
+    PLAY_NEXT_LEVEL,
+    CREDITS
+};
 
 const int screenWidth = 1600;
 const int screenHeight = 900;
 
 unsigned int FPS = 120;
-unsigned int layer = 0;
+unsigned int layer = MAIN_MENU;
 unsigned int previousLayer = 0;
 unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
+
+int creditsHeight = 120;
+
 bool cursorVisible = true;
+
 float elapsedTime = 0.0f;
 float blinkInterval = 0.5f;
 
@@ -53,14 +67,3 @@ Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 
 Sound menuOptionsSound;
-
-enum LAYERS
-{
-    MAIN_MENU,
-    LEVEL,
-    SETTINGS,
-    PAUSED,
-    WON_SCREEN,
-    PLAY_NEXT_LEVEL,
-    CREDITS
-};
