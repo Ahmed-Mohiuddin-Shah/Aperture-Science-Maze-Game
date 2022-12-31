@@ -26,6 +26,8 @@ int main(void)
 	apertureScienceLogoRectangle = (Rectangle){0.0f, 0.0f, apertureLogo.width, apertureLogo.height};
 	apertureScienceLogoOrigin = (Vector2){apertureLogo.width / 4, apertureLogo.height / 4};
 
+	windowIcon = LoadImageFromTexture(apertureLogo);
+	SetWindowIcon(windowIcon);
 	loadLevel(currentLevel);
 
 	wallCube = LoadModel("Wall.obj");

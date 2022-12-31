@@ -34,6 +34,7 @@ float swap;
 BoundingBox floorBoundingBox, ballBoundingBox, endGateBoundingBox;
 
 Texture2D wallTexture, apertureLogo;
+Image windowIcon;
 
 RenderTexture2D target;
 
