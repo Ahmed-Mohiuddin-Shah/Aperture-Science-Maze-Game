@@ -6,10 +6,7 @@
 
 int main(void)
 {
-	// Initialization
-	//--------------------------------------------------------------------------------------
 	InitWindow(screenWidth, screenHeight, titleText);
-	// ToggleFullscreen();
 
 	consolasFont = LoadFontEx("resources/consolas.ttf", 96, 0, 0);
 
@@ -24,6 +21,10 @@ int main(void)
 	SetCameraMode(worldCamera, CAMERA_PERSPECTIVE);
 
 	scanlineShader = LoadShader(0, "resources/scanlines.fs");
+
+	apertureLogo = LoadTexture("resources/ap_logo.png");
+	apertureScienceLogoRectangle = (Rectangle){0.0f, 0.0f, apertureLogo.width, apertureLogo.height};
+	apertureScienceLogoOrigin = (Vector2){apertureLogo.width / 4, apertureLogo.height / 4};
 
 	loadLevel(currentLevel);
 
@@ -58,6 +59,15 @@ int main(void)
 			break;
 		case PAUSED:
 			paused();
+			break;
+		case PLAY_NEXT_LEVEL:
+			nextLevel();
+			break;
+		case WON_SCREEN:
+			winningScreen();
+			break;
+		case CREDITS:
+			creditScreen();
 			break;
 		}
 	}

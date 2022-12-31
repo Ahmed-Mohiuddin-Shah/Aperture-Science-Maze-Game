@@ -13,6 +13,14 @@ void loadLevel(int currentLevel)
     {
         for (int j = 0; j < RectCount; j++)
         {
+            rectanglesOfLevel[i][j] = (Rectangle){0, 0, 0, 0};
+        }
+    }
+
+    for (int i = 0; i < RectCount; i++)
+    {
+        for (int j = 0; j < RectCount; j++)
+        {
             if (levels[currentLevel][i][j])
             {
                 rectanglesOfLevel[i][j] = (Rectangle){i * 4, j * 4, 4, 4};
@@ -118,7 +126,15 @@ void drawConsoleOverlay()
         DrawRectangleLinesEx((Rectangle){screenWidth - 580, 12, 100, 45}, 5.0f, TERMINALOUTLINEYELLOW);
         DrawTextEx(consolasFont, TextFormat("%d", GetFPS()), (Vector2){screenWidth - 560, 25}, 25, 0.5, TERMINALTEXTGOLD);
     }
+    apertureLogoRotaion += GetFrameTime() * 100; // Ignore Warning
+    if (apertureLogoRotaion > 360)
+    {
+        apertureLogoRotaion = 0;
+    }
     DrawTextEx(consolasFont, TextFormat("%d.\n%d.\n%d.\n0%d", GetRandomValue(100, 200), GetRandomValue(120, 170), GetRandomValue(10, 50), GetRandomValue(0, 9)), (Vector2){screenWidth - 290, 25}, 25, 0.5, TERMINALTEXTGOLD);
+
+    DrawTexturePro(apertureLogo, apertureScienceLogoRectangle, (Rectangle){screenWidth - 130, 92, apertureScienceLogoOrigin.x * 2, apertureScienceLogoOrigin.y * 2}, apertureScienceLogoOrigin, apertureLogoRotaion, WHITE);
+
     BeginShaderMode(scanlineShader);
     // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
     DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)-target.texture.height}, (Vector2){0, 0}, WHITE);
@@ -127,21 +143,24 @@ void drawConsoleOverlay()
 
 void drawMap()
 {
-    DrawRectangleRec((Rectangle){screenWidth - 470, 12, 160, 160}, TERMINALBROWN);
-
-    for (int i = 0; i < RectCount; i++)
+    if (shouldDrawMap)
     {
-        for (int j = 0; j < 40; j++)
+        DrawRectangleRec((Rectangle){screenWidth - 470, 12, 160, 160}, TERMINALBROWN);
+
+        for (int i = 0; i < RectCount; i++)
         {
-            if (levels[currentLevel][i][j])
+            for (int j = 0; j < 40; j++)
             {
-                DrawRectangleRec((Rectangle){rectanglesOfLevel[i][j].x + screenWidth - 470, rectanglesOfLevel[i][j].y + 12, rectanglesOfLevel[i][j].width, rectanglesOfLevel[i][j].height}, TERMINALOUTLINEYELLOW);
+                if (levels[currentLevel][i][j])
+                {
+                    DrawRectangleRec((Rectangle){rectanglesOfLevel[i][j].x + screenWidth - 470, rectanglesOfLevel[i][j].y + 12, rectanglesOfLevel[i][j].width, rectanglesOfLevel[i][j].height}, TERMINALOUTLINEYELLOW);
+                }
             }
         }
+        DrawRectangleRec((Rectangle){CoordinateOftartAndEndRectangle[0] + screenWidth - 470, CoordinateOftartAndEndRectangle[1] + 12, rectanglesOfLevel[0][0].width, rectanglesOfLevel[0][0].height}, RED);
+        DrawRectangleRec((Rectangle){CoordinateOftartAndEndRectangle[2] + screenWidth - 470, CoordinateOftartAndEndRectangle[3] + 12, rectanglesOfLevel[0][0].width, rectanglesOfLevel[0][0].height}, GREEN);
+        DrawCircle(PlayerOrigin.x + screenWidth - 470, PlayerOrigin.y + 12, Radius * 3, TERMINALTEXTGOLD);
     }
-    DrawRectangleRec((Rectangle){CoordinateOftartAndEndRectangle[0] + screenWidth - 470, CoordinateOftartAndEndRectangle[1] + 12, rectanglesOfLevel[0][0].width, rectanglesOfLevel[0][0].height}, RED);
-    DrawRectangleRec((Rectangle){CoordinateOftartAndEndRectangle[2] + screenWidth - 470, CoordinateOftartAndEndRectangle[3] + 12, rectanglesOfLevel[0][0].width, rectanglesOfLevel[0][0].height}, GREEN);
-    DrawCircle(PlayerOrigin.x + screenWidth - 470, PlayerOrigin.y + 12, Radius * 3, TERMINALTEXTGOLD);
 }
 
 void mainMenu()
@@ -150,12 +169,12 @@ void mainMenu()
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, titleTextASCII, (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
-    DrawTextEx(consolasFont, "Play", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("%s", currentLevel == 0 ? "Play" : "Continue"), (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 280, 120, 50} : (Rectangle){45, screenHeight - 280, 210, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 240, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, "Exit", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(160, screenHeight - 140);
 
-    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 120, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), currentLevel == 0 ? (Rectangle){45, screenHeight - 280, 120, 50} : (Rectangle){45, screenHeight - 280, 210, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             layer = LEVEL;
@@ -184,8 +203,11 @@ void settingsMenu()
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "Settings", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
-    DrawTextEx(consolasFont, "Window Mode: ", (Vector2){45, screenHeight - 350}, 50, 0.5, TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, TextFormat("             %s", IsWindowFullscreen() ? "<FULLSCREEN>" : "<WINDOWED>"), (Vector2){45, screenHeight - 350}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 350, 330, 50} : (Rectangle){400, screenHeight - 350, 350, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Window Mode: ", (Vector2){45, screenHeight - 420}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("             %s", IsWindowFullscreen() ? "<FULLSCREEN>" : "<WINDOWED>"), (Vector2){45, screenHeight - 420}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 420, 330, 50} : (Rectangle){400, screenHeight - 420, 350, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+
+    DrawTextEx(consolasFont, "Draw Map: ", (Vector2){45, screenHeight - 350}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("          %s", shouldDrawMap ? "<ON>" : "<OFF>"), (Vector2){45, screenHeight - 350}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), shouldDrawMap ? (Rectangle){315, screenHeight - 350, 115, 50} : (Rectangle){315, screenHeight - 350, 135, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
 
     DrawTextEx(consolasFont, "Target FPS: ", (Vector2){45, screenHeight - 280}, 50, 0.5, TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, TextFormat("            <%d>", FPS), (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), FPS < 100 ? (Rectangle){380, screenHeight - 280, 100, 50} : (Rectangle){380, screenHeight - 280, 130, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
@@ -196,10 +218,16 @@ void settingsMenu()
     DrawTextEx(consolasFont, "Back", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(160, screenHeight - 140);
 
-    if (CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 350, 330, 50} : (Rectangle){400, screenHeight - 350, 280, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 420, 330, 50} : (Rectangle){400, screenHeight - 420, 280, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             ToggleFullscreen();
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), shouldDrawMap ? (Rectangle){315, screenHeight - 350, 115, 50} : (Rectangle){315, screenHeight - 350, 135, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            shouldDrawMap = shouldDrawMap ? false : true;
     }
 
     if (CheckCollisionPointRec(GetMousePosition(), FPS < 100 ? (Rectangle){380, screenHeight - 280, 100, 50} : (Rectangle){380, screenHeight - 280, 130, 50}))
@@ -225,6 +253,74 @@ void settingsMenu()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             layer = previousLayer;
     }
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
+void nextLevel()
+{
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    DrawTextEx(consolasFont, "PASSED", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+
+    DrawTextEx(consolasFont, "Continue", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 210, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    drawBlinkingCursor(310, screenHeight - 140);
+
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 210, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = LEVEL;
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            previousLayer = layer;
+            layer = SETTINGS;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = MAIN_MENU;
+    }
+
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
+void winningScreen()
+{
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    DrawTextEx(consolasFont, "YOU PASSED THE \nTEST", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+
+    DrawTextEx(consolasFont, "Credits", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 190, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    drawBlinkingCursor(310, screenHeight - 140);
+
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 190, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = CREDITS;
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            previousLayer = layer;
+            layer = SETTINGS;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = MAIN_MENU;
+    }
+
     drawConsoleOverlay();
     EndDrawing();
 }
@@ -308,8 +404,18 @@ void level()
 
     if (CheckCollisionBoxSphere(endGateBoundingBox, ballPosition, Radius))
     {
-        // currentLevel++;
-        loadLevel(currentLevel);
+        currentLevel++;
+        if (currentLevel < LEVEL_COUNT)
+        {
+            loadLevel(currentLevel);
+            layer = PLAY_NEXT_LEVEL;
+        }
+        else
+        {
+            currentLevel = 0;
+            loadLevel(currentLevel);
+            layer = WON_SCREEN;
+        }
     }
 
     PlayerOrigin = newPosOrigin;
@@ -344,17 +450,17 @@ void paused()
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "Paused", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
-    DrawTextEx(consolasFont, "Resume", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 180, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 300, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Resume", (Vector2){45, screenHeight - 280}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 170, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Settings", (Vector2){45, screenHeight - 210}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(310, screenHeight - 140);
 
-    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 180, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 280, 170, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             layer = LEVEL;
     }
-    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 260, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 210, 230, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -362,12 +468,22 @@ void paused()
             layer = SETTINGS;
         }
     }
-    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 300, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             layer = MAIN_MENU;
     }
 
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
+void creditScreen()
+{
+
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
     drawConsoleOverlay();
     EndDrawing();
 }

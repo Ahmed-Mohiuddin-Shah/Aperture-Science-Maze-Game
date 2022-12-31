@@ -1,13 +1,13 @@
 /*******************************************************************************************
  *
- *   raylib [models] example - loading gltf
+ *   raylib [textures] example - Texture loading and drawing
  *
- *   Example originally created with raylib 3.7, last time updated with raylib 4.2
+ *   Example originally created with raylib 1.0, last time updated with raylib 1.0
  *
  *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
  *   BSD-like license that allows static linking with closed source software
  *
- *   Copyright (c) 2020-2022 Ramon Santamaria (@raysan5)
+ *   Copyright (c) 2014-2022 Ramon Santamaria (@raysan5)
  *
  ********************************************************************************************/
 
@@ -23,59 +23,48 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [models] example - loading gltf");
+    InitWindow(screenWidth, screenHeight, "raylib [textures] example - texture loading and drawing");
 
-    // Define the camera to look into our 3d world
-    Camera camera = {0};
-    camera.position = (Vector3){10.0f, 10.0f, 10.0f}; // Camera position
-    camera.target = (Vector3){0.0f, 0.0f, 0.0f};      // Camera looking at point
-    camera.up = (Vector3){0.0f, 1.0f, 0.0f};          // Camera up vector (rotation towards target)
-    camera.fovy = 45.0f;                              // Camera field-of-view Y
-    camera.projection = CAMERA_PERSPECTIVE;           // Camera mode type
+    // NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
+    Texture2D texture = LoadTexture("resources/ap_logo.png"); // Texture loading
+    //---------------------------------------------------------------------------------------
+    float rotation = 0;
+    int frameWidth = texture.width;
+    int frameHeight = texture.height;
 
-    // Loaf gltf model
-    Model model = LoadModel("Wall.obj");
-    // Texture2D texture = LoadTexture("1024x768.jpg");
-    // SetMaterialTexture(model.materials, MATERIAL_MAP_DIFFUSE, texture);
-    Image image = LoadImage("Wall.png");
-    Texture2D texture = LoadTextureFromImage(image); // Load model texture
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    // Source rectangle (part of the texture to use for drawing)
+    Rectangle sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight};
 
-    Vector3 position = {0.0f, 0.0f, 0.0f}; // Set model position
+    // Destination rectangle (screen rectangle where drawing part of texture)
+    Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f};
 
-    SetCameraMode(camera, CAMERA_FREE); // Set free camera mode
-
-    SetTargetFPS(60); // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
+    // Origin of the texture (rotation/scale point), it's relative to destination rectangle size
+    Vector2 origin = {(float)frameWidth, (float)frameHeight};
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         // Update
         //----------------------------------------------------------------------------------
-        UpdateCamera(&camera);
+        // TODO: Update your variables here
         //----------------------------------------------------------------------------------
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-        ClearBackground(SKYBLUE);
+        ClearBackground(RAYWHITE);
 
-        BeginMode3D(camera);
+        DrawTexturePro(texture, sourceRec, destRec, origin, (float)rotation++, WHITE);
 
-        DrawModel(model, position, 1.0f, RAYWHITE);
-        DrawGrid(10, 1.0f); // Draw a grid
+        DrawText("this IS a texture!", 360, 370, 10, GRAY);
 
-        EndMode3D();
-        // DrawTexture(texture, 30, 30, WHITE);
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadModel(model); // Unload model and meshes/material
+    UnloadTexture(texture); // Texture unloading
 
     CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
