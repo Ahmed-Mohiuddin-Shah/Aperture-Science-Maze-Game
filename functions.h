@@ -480,10 +480,18 @@ void paused()
 
 void creditScreen()
 {
-
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
+
+    DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    drawBlinkingCursor(310, screenHeight - 140);
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            layer = MAIN_MENU;
+    }
     drawConsoleOverlay();
     EndDrawing();
 }
