@@ -21,6 +21,7 @@ unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
 
 int creditsHeight = 120;
+int randomMusic = 0;
 
 bool cursorVisible = true;
 
@@ -41,7 +42,7 @@ Rectangle rectanglesOfLevel[RectCount][RectCount] = {}, apertureScienceLogoRecta
 
 Camera worldCamera = {0};
 
-Model wallCube, floorModel, ballModel;
+Model wallCube, floorModel, ballModel, targetCube;
 
 float swap;
 
@@ -66,4 +67,6 @@ Color TERMINALBROWN = {99, 59, 7, 255};
 Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 
-Sound menuOptionsSound;
+Music mainMenuMusic, creditsMusic, levelMusic[6];
+
+Sound splitFlapSound, buttonPressSound, buzzerSound, winSound;

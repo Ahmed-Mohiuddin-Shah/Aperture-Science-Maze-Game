@@ -7,6 +7,20 @@
 int main(void)
 {
 	InitWindow(screenWidth, screenHeight, titleText);
+	InitAudioDevice();
+
+	mainMenuMusic = LoadMusicStream("resources/MainMenu.mp3");
+	creditsMusic = LoadMusicStream("resources/Credits.mp3");
+
+	splitFlapSound = LoadSound("resources/SplitFlap.mp3");
+	buttonPressSound = LoadSound("resources/ButtonPress.mp3");
+	buzzerSound = LoadSound("resources/BuzzerSound.mp3");
+	winSound = LoadSound("resources/WinSound.mp3");
+
+	for (int i = 0; i < 6; i++)
+	{
+		levelMusic[i] = LoadMusicStream(TextFormat("resources/Music%d.mp3", i + 1));
+	}
 
 	consolasFont = LoadFontEx("resources/consolas.ttf", 96, 0, 0);
 
@@ -34,6 +48,9 @@ int main(void)
 	wallTexture = LoadTexture("Wall.png");
 	wallCube.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = wallTexture;
 
+	targetCube = LoadModel("Target.obj");
+	targetCube.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTexture("Target.png");
+
 	ballModel = LoadModel("Ball.obj");
 
 	floorModel = LoadModel("Floor.obj");
@@ -45,6 +62,8 @@ int main(void)
 
 	SetTargetFPS(FPS);
 
+	PlaySound(splitFlapSound);
+	randomMusic = GetRandomValue(0, 5);
 	// Main game loop
 	while (!shouldExit && !WindowShouldClose()) // Detect window close button or ESC key or if Exit is pressed
 	{
@@ -75,8 +94,13 @@ int main(void)
 	}
 	UnloadShader(scanlineShader);
 	UnloadModel(ballModel);
+	UnloadModel(targetCube);
 	UnloadModel(wallCube);
 	UnloadModel(floorModel);
+	UnloadMusicStream(mainMenuMusic);
+	UnloadMusicStream(creditsMusic);
+	UnloadSound(splitFlapSound);
+	UnloadSound(buttonPressSound);
 	CloseWindow();
 
 	return 0;

@@ -3,10 +3,6 @@ float getGravity()
     return 100 * GetFrameTime() * 0.98;
 }
 
-void drawTypwriterEffect(int x, int y, int textHeight, int textLength)
-{
-}
-
 void loadLevel(int currentLevel)
 {
     for (int i = 0; i < RectCount; i++)
@@ -109,7 +105,14 @@ void drawBlinkingCursor(float x, float y)
         DrawTextEx(consolasFont, "_", (Vector2){x, y}, 50, 0.5, TERMINALTEXTGOLD);
         if (layer == CREDITS)
         {
-            creditsHeight--;
+            if (GetFPS() == 30)
+            {
+                creditsHeight -= 2;
+            }
+            else
+            {
+                creditsHeight--;
+            }
         }
     }
 }
@@ -169,6 +172,8 @@ void drawMap()
 
 void mainMenu()
 {
+    PlayMusicStream(mainMenuMusic);
+    UpdateMusicStream(mainMenuMusic);
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, titleTextASCII, (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -184,6 +189,8 @@ void mainMenu()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             HideCursor();
+            SeekMusicStream(mainMenuMusic, 0.0);
+            PlaySound(buttonPressSound);
             layer = LEVEL;
         }
     }
@@ -193,6 +200,8 @@ void mainMenu()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             creditsHeight = screenHeight - 140;
+            SeekMusicStream(mainMenuMusic, 0.0);
+            PlaySound(buttonPressSound);
             layer = CREDITS;
         }
     }
@@ -202,6 +211,7 @@ void mainMenu()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             previousLayer = layer;
+            PlaySound(buttonPressSound);
             layer = SETTINGS;
         }
     }
@@ -217,6 +227,16 @@ void mainMenu()
 
 void settingsMenu()
 {
+    if ((previousLayer == MAIN_MENU) || (previousLayer == WON_SCREEN) || (previousLayer == PLAY_NEXT_LEVEL))
+    {
+        PlayMusicStream(mainMenuMusic);
+        UpdateMusicStream(mainMenuMusic);
+    }
+    else if (previousLayer == LEVEL)
+    {
+        PlayMusicStream(levelMusic[randomMusic]);
+        UpdateMusicStream(levelMusic[randomMusic]);
+    }
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "Settings", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -239,19 +259,27 @@ void settingsMenu()
     if (CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 420, 330, 50} : (Rectangle){400, screenHeight - 420, 280, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
             ToggleFullscreen();
+        }
     }
 
     if (CheckCollisionPointRec(GetMousePosition(), shouldDrawMap ? (Rectangle){315, screenHeight - 350, 115, 50} : (Rectangle){315, screenHeight - 350, 135, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
             shouldDrawMap = shouldDrawMap ? false : true;
+        }
     }
 
     if (CheckCollisionPointRec(GetMousePosition(), FPS < 100 ? (Rectangle){380, screenHeight - 280, 100, 50} : (Rectangle){380, screenHeight - 280, 130, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
+            PlaySound(buttonPressSound);
+
             FPS = FPS + 30;
             if (FPS > 240)
                 FPS = 30;
@@ -263,13 +291,19 @@ void settingsMenu()
     if (CheckCollisionPointRec(GetMousePosition(), shouldDrawFPS ? (Rectangle){400, screenHeight - 210, 115, 50} : (Rectangle){400, screenHeight - 210, 135, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
             shouldDrawFPS = shouldDrawFPS ? false : true;
+        }
     }
 
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
             layer = previousLayer;
+        }
     }
     drawConsoleOverlay();
     EndDrawing();
@@ -277,6 +311,8 @@ void settingsMenu()
 
 void nextLevel()
 {
+    PlayMusicStream(levelMusic[randomMusic]);
+    UpdateMusicStream(levelMusic[randomMusic]);
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "PASSED", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -291,6 +327,7 @@ void nextLevel()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             HideCursor();
+            PlaySound(buttonPressSound);
             layer = LEVEL;
         }
     }
@@ -299,13 +336,17 @@ void nextLevel()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             previousLayer = layer;
+            PlaySound(buttonPressSound);
             layer = SETTINGS;
         }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
             layer = MAIN_MENU;
+        }
     }
 
     drawConsoleOverlay();
@@ -314,6 +355,8 @@ void nextLevel()
 
 void winningScreen()
 {
+    PlayMusicStream(creditsMusic);
+    UpdateMusicStream(creditsMusic);
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "YOU PASSED THE \nTEST", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -328,6 +371,7 @@ void winningScreen()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             creditsHeight = screenHeight - 140;
+            PlaySound(buttonPressSound);
             layer = CREDITS;
         }
     }
@@ -336,13 +380,18 @@ void winningScreen()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             previousLayer = layer;
+            PlaySound(buttonPressSound);
             layer = SETTINGS;
         }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
+            SeekMusicStream(creditsMusic, 0.0);
             layer = MAIN_MENU;
+        }
     }
 
     drawConsoleOverlay();
@@ -351,9 +400,12 @@ void winningScreen()
 
 void level()
 {
+    PlayMusicStream(levelMusic[randomMusic]);
+    UpdateMusicStream(levelMusic[randomMusic]);
     if (IsKeyPressed(KEY_P))
     {
         ShowCursor();
+        PlaySound(buzzerSound);
         layer = PAUSED;
     }
     ballPosition.x = PlayerOrigin.x;
@@ -366,25 +418,21 @@ void level()
     if (IsKeyDown(KEY_UP))
     {
         newPosOrigin.y -= 20 * GetFrameTime();
-        worldCamera.target.z -= 1;
     }
 
     if (IsKeyDown(KEY_DOWN))
     {
         newPosOrigin.y += 20 * GetFrameTime();
-        worldCamera.target.z += 1;
     }
 
     if (IsKeyDown(KEY_RIGHT))
     {
         newPosOrigin.x += 20 * GetFrameTime();
-        worldCamera.up.x -= 0.01;
     }
 
     if (IsKeyDown(KEY_LEFT))
     {
         newPosOrigin.x -= 20 * GetFrameTime();
-        worldCamera.up.x += 0.01;
     }
 
     for (int i = 0; i < RectCount; i++)
@@ -434,12 +482,18 @@ void level()
         if (currentLevel < LEVEL_COUNT)
         {
             loadLevel(currentLevel);
+            SeekMusicStream(levelMusic[randomMusic], 0.0);
+            PlaySound(winSound);
+            randomMusic = GetRandomValue(0, 5);
             layer = PLAY_NEXT_LEVEL;
         }
         else
         {
             currentLevel = 0;
             loadLevel(currentLevel);
+            SeekMusicStream(levelMusic[randomMusic], 0.0);
+            randomMusic = GetRandomValue(0, 5);
+            PlaySound(winSound);
             layer = WON_SCREEN;
         }
     }
@@ -461,8 +515,7 @@ void level()
             }
         }
     }
-    DrawModel(wallCube, (Vector3){154, 2, 152}, 4.0, WHITE);
-    DrawBoundingBox(endGateBoundingBox, RED);
+    DrawModel(targetCube, (Vector3){154, 2, 152}, 4.0, WHITE);
     EndMode3D();
     BeginDrawing();
     drawConsoleOverlay();
@@ -472,6 +525,14 @@ void level()
 
 void paused()
 {
+    PlayMusicStream(levelMusic[randomMusic]);
+    UpdateMusicStream(levelMusic[randomMusic]);
+    if (IsKeyPressed(KEY_P))
+    {
+        HideCursor();
+        PlaySound(buzzerSound);
+        layer = LEVEL;
+    }
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "Paused", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -486,6 +547,7 @@ void paused()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             HideCursor();
+            PlaySound(buttonPressSound);
             layer = LEVEL;
         }
     }
@@ -494,13 +556,18 @@ void paused()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             previousLayer = layer;
+            PlaySound(buttonPressSound);
             layer = SETTINGS;
         }
     }
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
+            SeekMusicStream(levelMusic[randomMusic], 0.0);
             layer = MAIN_MENU;
+        }
     }
 
     drawConsoleOverlay();
@@ -509,6 +576,8 @@ void paused()
 
 void creditScreen()
 {
+    PlayMusicStream(creditsMusic);
+    UpdateMusicStream(creditsMusic);
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
 
@@ -523,6 +592,8 @@ void creditScreen()
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             creditsHeight = screenHeight - 140;
+            SeekMusicStream(creditsMusic, 0.0);
+            PlaySound(buttonPressSound);
             layer = MAIN_MENU;
         }
     }
