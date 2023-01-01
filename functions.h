@@ -425,7 +425,8 @@ void level()
 {
     PlayMusicStream(levelMusic[randomMusic]);
     UpdateMusicStream(levelMusic[randomMusic]);
-    if (IsKeyPressed(KEY_P))
+    ballRotation = (Vector2){0, 0};
+    if (IsKeyPressed(PAUSE_KEY))
     {
         ShowCursor();
         PlaySound(buzzerSound);
@@ -457,6 +458,9 @@ void level()
     {
         newPosOrigin.x -= 20 * GetFrameTime();
     }
+
+    newPosOrigin.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
+    newPosOrigin.y += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
 
     for (int i = 0; i < RectCount; i++)
     {
@@ -550,7 +554,7 @@ void paused()
 {
     PlayMusicStream(levelMusic[randomMusic]);
     UpdateMusicStream(levelMusic[randomMusic]);
-    if (IsKeyPressed(KEY_P))
+    if (IsKeyPressed(PAUSE_KEY))
     {
         HideCursor();
         PlaySound(buzzerSound);
