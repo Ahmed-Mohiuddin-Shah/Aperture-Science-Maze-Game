@@ -21,6 +21,7 @@ unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
 
 int creditsHeight = 120;
+int crtEffectRectangleHeight = -screenHeight;
 int randomMusic = 0;
 
 bool cursorVisible = true;
@@ -37,6 +38,7 @@ float apertureLogoRotaion = 0;
 bool shouldDrawFPS = false;
 bool shouldExit = false;
 bool shouldDrawMap = true;
+bool shouldDrawCRTEffect = true;
 
 Rectangle rectanglesOfLevel[RectCount][RectCount] = {}, apertureScienceLogoRectangle;
 
@@ -66,6 +68,7 @@ Font consolasFont;
 Color TERMINALBROWN = {99, 59, 7, 255};
 Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
+Color TERMINALTEXTGOLD_CRT_ALPHA = {255, 185, 9, 20};
 
 Music mainMenuMusic, creditsMusic, levelMusic[6];
 

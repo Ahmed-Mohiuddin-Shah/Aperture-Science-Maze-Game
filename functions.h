@@ -142,10 +142,20 @@ void drawConsoleOverlay()
 
     DrawTexturePro(apertureLogo, apertureScienceLogoRectangle, (Rectangle){screenWidth - 130, 92, apertureScienceLogoOrigin.x * 2, apertureScienceLogoOrigin.y * 2}, apertureScienceLogoOrigin, apertureLogoRotaion, WHITE);
 
-    BeginShaderMode(scanlineShader);
-    // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-    DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)-target.texture.height}, (Vector2){0, 0}, WHITE);
-    EndShaderMode();
+    if (shouldDrawCRTEffect)
+    {
+        if (crtEffectRectangleHeight > screenHeight)
+        {
+            crtEffectRectangleHeight = -screenHeight;
+        }
+        crtEffectRectangleHeight += GetFrameTime() * 1000;
+        DrawRectangleGradientV(0, crtEffectRectangleHeight, screenWidth, screenHeight / 2, (Color){TERMINALTEXTGOLD_CRT_ALPHA.r, TERMINALTEXTGOLD_CRT_ALPHA.g, TERMINALTEXTGOLD_CRT_ALPHA.b, 0}, TERMINALTEXTGOLD_CRT_ALPHA);
+
+        BeginShaderMode(scanlineShader);
+        // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
+        DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)-target.texture.height}, (Vector2){0, 0}, WHITE);
+        EndShaderMode();
+    }
 }
 
 void drawMap()
@@ -241,9 +251,12 @@ void settingsMenu()
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "Settings", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
 
-    DrawTextEx(consolasFont, "Window Mode: ", (Vector2){45, screenHeight - 420}, 50, 0.5, TERMINALTEXTGOLD);
-    DrawTextEx(consolasFont, TextFormat("             %s", IsWindowFullscreen() ? "<FULLSCREEN>" : "<WINDOWED>"), (Vector2){45, screenHeight - 420}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 420, 330, 50} : (Rectangle){400, screenHeight - 420, 350, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
-
+    DrawTextEx(consolasFont, "Window Mode: ", (Vector2){45, screenHeight - 490}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("             %s", IsWindowFullscreen() ? "<FULLSCREEN>" : "<WINDOWED>"), (Vector2){45, screenHeight - 490}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 490, 330, 50} : (Rectangle){400, screenHeight - 490, 350, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    /// @brief ///////////
+    DrawTextEx(consolasFont, "CRT Effect: ", (Vector2){45, screenHeight - 420}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, TextFormat("            %s", shouldDrawCRTEffect ? "<ON>" : "<OFF>"), (Vector2){45, screenHeight - 420}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), shouldDrawCRTEffect ? (Rectangle){375, screenHeight - 420, 115, 50} : (Rectangle){375, screenHeight - 420, 135, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
+    /// @brief //////////////
     DrawTextEx(consolasFont, "Draw Map: ", (Vector2){45, screenHeight - 350}, 50, 0.5, TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, TextFormat("          %s", shouldDrawMap ? "<ON>" : "<OFF>"), (Vector2){45, screenHeight - 350}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), shouldDrawMap ? (Rectangle){315, screenHeight - 350, 115, 50} : (Rectangle){315, screenHeight - 350, 135, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
 
@@ -256,7 +269,7 @@ void settingsMenu()
     DrawTextEx(consolasFont, "Back", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 120, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(160, screenHeight - 140);
 
-    if (CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 420, 330, 50} : (Rectangle){400, screenHeight - 420, 280, 50}))
+    if (CheckCollisionPointRec(GetMousePosition(), IsWindowFullscreen() ? (Rectangle){400, screenHeight - 490, 330, 50} : (Rectangle){400, screenHeight - 490, 280, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -264,6 +277,16 @@ void settingsMenu()
             ToggleFullscreen();
         }
     }
+    ////////////////////////////
+    if (CheckCollisionPointRec(GetMousePosition(), shouldDrawCRTEffect ? (Rectangle){375, screenHeight - 420, 115, 50} : (Rectangle){375, screenHeight - 420, 135, 50}))
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(buttonPressSound);
+            shouldDrawCRTEffect = shouldDrawCRTEffect ? false : true;
+        }
+    }
+    /////////////
 
     if (CheckCollisionPointRec(GetMousePosition(), shouldDrawMap ? (Rectangle){315, screenHeight - 350, 115, 50} : (Rectangle){315, screenHeight - 350, 135, 50}))
     {
@@ -282,7 +305,7 @@ void settingsMenu()
 
             FPS = FPS + 30;
             if (FPS > 240)
-                FPS = 30;
+                FPS = 60;
 
             SetTargetFPS(FPS);
         }

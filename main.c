@@ -42,6 +42,7 @@ int main(void)
 
 	windowIcon = LoadImageFromTexture(apertureLogo);
 	SetWindowIcon(windowIcon);
+
 	loadLevel(currentLevel);
 
 	wallCube = LoadModel("Wall.obj");
@@ -64,6 +65,7 @@ int main(void)
 
 	PlaySound(splitFlapSound);
 	randomMusic = GetRandomValue(0, 5);
+	SetExitKey(KEY_F4);
 	// Main game loop
 	while (!shouldExit && !WindowShouldClose()) // Detect window close button or ESC key or if Exit is pressed
 	{
