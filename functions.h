@@ -144,6 +144,7 @@ void drawConsoleOverlay()
 
     if (shouldDrawCRTEffect)
     {
+        UpdateMusicStream(CRTBuzzMusic);
         if (crtEffectRectangleHeight > screenHeight)
         {
             crtEffectRectangleHeight = -screenHeight;
@@ -237,12 +238,12 @@ void mainMenu()
 
 void settingsMenu()
 {
-    if ((previousLayer == MAIN_MENU) || (previousLayer == WON_SCREEN) || (previousLayer == PLAY_NEXT_LEVEL))
+    if (previousLayer == MAIN_MENU)
     {
         PlayMusicStream(mainMenuMusic);
         UpdateMusicStream(mainMenuMusic);
     }
-    else if (previousLayer == LEVEL)
+    else if (previousLayer == PAUSED)
     {
         PlayMusicStream(levelMusic[randomMusic]);
         UpdateMusicStream(levelMusic[randomMusic]);
@@ -275,6 +276,9 @@ void settingsMenu()
         {
             PlaySound(buttonPressSound);
             ToggleFullscreen();
+            screenWidth = GetScreenWidth();
+            screenHeight = GetScreenHeight();
+            SetWindowIcon(windowIcon);
         }
     }
     ////////////////////////////
@@ -282,7 +286,8 @@ void settingsMenu()
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            PlaySound(buttonPressSound);
+            PlaySound(CRTOnOffSound);
+            SeekMusicStream(CRTBuzzMusic, 0.0);
             shouldDrawCRTEffect = shouldDrawCRTEffect ? false : true;
         }
     }
@@ -334,8 +339,6 @@ void settingsMenu()
 
 void nextLevel()
 {
-    PlayMusicStream(levelMusic[randomMusic]);
-    UpdateMusicStream(levelMusic[randomMusic]);
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "PASSED", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
@@ -466,6 +469,8 @@ void level()
 
     newPosOrigin.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
     newPosOrigin.y += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
+    newPosOrigin.x += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
+    newPosOrigin.y += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
 
     for (int i = 0; i < RectCount; i++)
     {

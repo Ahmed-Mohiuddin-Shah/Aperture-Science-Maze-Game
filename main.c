@@ -11,11 +11,13 @@ int main(void)
 
 	mainMenuMusic = LoadMusicStream("resources/MainMenu.mp3");
 	creditsMusic = LoadMusicStream("resources/Credits.mp3");
+	CRTBuzzMusic = LoadMusicStream("resources/CRTBuzz.wav");
 
 	splitFlapSound = LoadSound("resources/SplitFlap.mp3");
 	buttonPressSound = LoadSound("resources/ButtonPress.mp3");
 	buzzerSound = LoadSound("resources/BuzzerSound.mp3");
 	winSound = LoadSound("resources/WinSound.mp3");
+	CRTOnOffSound = LoadSound("resources/CRTEffect.wav");
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -67,6 +69,7 @@ int main(void)
 	randomMusic = GetRandomValue(0, 5);
 	SetExitKey(KEY_F4);
 	// Main game loop
+	PlayMusicStream(CRTBuzzMusic);
 	while (!shouldExit && !WindowShouldClose()) // Detect window close button or ESC key or if Exit is pressed
 	{
 		switch (layer)
@@ -101,11 +104,15 @@ int main(void)
 	UnloadModel(floorModel);
 	UnloadMusicStream(mainMenuMusic);
 	UnloadMusicStream(creditsMusic);
+	UnloadMusicStream(CRTBuzzMusic);
 	for (int i = 0; i < 6; i++)
 	{
 		UnloadMusicStream(levelMusic[i]);
 	}
 	UnloadSound(splitFlapSound);
+	UnloadSound(buzzerSound);
+	UnloadSound(winSound);
+	UnloadSound(CRTOnOffSound);
 	UnloadSound(buttonPressSound);
 	CloseWindow();
 

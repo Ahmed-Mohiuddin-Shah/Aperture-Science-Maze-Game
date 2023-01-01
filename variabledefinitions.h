@@ -16,8 +16,11 @@ enum KEY_DEFINITIONS
     PAUSE_KEY = KEY_ESCAPE
 };
 
-const int screenWidth = 1600;
-const int screenHeight = 900;
+int screenWidth = 1600;
+int screenHeight = 900;
+
+const int constScreenWidth = 1600;
+const int constScreenHeight = 900;
 
 unsigned int FPS = 120;
 unsigned int layer = MAIN_MENU;
@@ -26,7 +29,7 @@ unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
 
 int creditsHeight = 120;
-int crtEffectRectangleHeight = -screenHeight;
+int crtEffectRectangleHeight = -constScreenHeight;
 int randomMusic = 0;
 int ballRotationSpeed = 0;
 
@@ -77,6 +80,6 @@ Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 Color TERMINALTEXTGOLD_CRT_ALPHA = {255, 185, 9, 15};
 
-Music mainMenuMusic, creditsMusic, levelMusic[6];
+Music mainMenuMusic, creditsMusic, levelMusic[6], CRTBuzzMusic;
 
-Sound splitFlapSound, buttonPressSound, buzzerSound, winSound;
+Sound splitFlapSound, buttonPressSound, buzzerSound, winSound, CRTOnOffSound;
