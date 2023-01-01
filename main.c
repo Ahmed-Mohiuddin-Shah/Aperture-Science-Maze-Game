@@ -101,6 +101,10 @@ int main(void)
 	UnloadModel(floorModel);
 	UnloadMusicStream(mainMenuMusic);
 	UnloadMusicStream(creditsMusic);
+	for (int i = 0; i < 6; i++)
+	{
+		UnloadMusicStream(levelMusic[i]);
+	}
 	UnloadSound(splitFlapSound);
 	UnloadSound(buttonPressSound);
 	CloseWindow();
