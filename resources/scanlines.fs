@@ -43,7 +43,7 @@ void main()
     float wavePos = cos((fract(globalPos) - 0.5)*3.14);
 
     // Texel color fetching from texture sampler
-    vec4 texelColor = vec4(0.1, 0.0, 0.2, 0.3);
+    vec4 texelColor = vec4(0.1, 0.0, 0.2, 0.2);
 
     finalColor = mix(vec4(0.0, 0.3, 0.0, 0.0), texelColor, wavePos);
 }
