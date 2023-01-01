@@ -11,6 +11,11 @@ enum LAYERS
     CREDITS
 };
 
+enum KEY_DEFINITIONS
+{
+    PAUSE_KEY = KEY_ESCAPE
+};
+
 const int screenWidth = 1600;
 const int screenHeight = 900;
 
@@ -23,6 +28,7 @@ unsigned int cursorBlinkCounter = 0;
 int creditsHeight = 120;
 int crtEffectRectangleHeight = -screenHeight;
 int randomMusic = 0;
+int ballRotationSpeed = 0;
 
 bool cursorVisible = true;
 
@@ -60,6 +66,7 @@ Shader scanlineShader;
 Vector2 newPosOrigin;
 Vector2 apertureScienceLogoOrigin;
 Vector2 PlayerOrigin = {0, 0};
+Vector2 ballRotation = {0, 0};
 
 Vector3 ballPosition = {0, 2.5, 0};
 
