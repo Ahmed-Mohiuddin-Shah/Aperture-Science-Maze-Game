@@ -380,6 +380,11 @@ void winningScreen()
 {
     PlayMusicStream(creditsMusic);
     UpdateMusicStream(creditsMusic);
+    if (GetMusicTimePlayed(creditsMusic) > 10)
+    {
+        creditsHeight = screenHeight - 140;
+        layer = CREDITS;
+    }
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
     DrawTextEx(consolasFont, "YOU PASSED THE \nTEST", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
