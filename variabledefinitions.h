@@ -75,7 +75,7 @@ Font consolasFont;
 Color TERMINALBROWN = {99, 59, 7, 255};
 Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
-Color TERMINALTEXTGOLD_CRT_ALPHA = {255, 185, 9, 20};
+Color TERMINALTEXTGOLD_CRT_ALPHA = {255, 185, 9, 15};
 
 Music mainMenuMusic, creditsMusic, levelMusic[6];
 
