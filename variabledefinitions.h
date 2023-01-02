@@ -1,5 +1,6 @@
 
 #define RectCount 40
+#define MAX_LEVEL_MUSIC_NUM 6
 enum LAYERS
 {
     MAIN_MENU,
@@ -13,7 +14,14 @@ enum LAYERS
 
 enum KEY_DEFINITIONS
 {
-    PAUSE_KEY = KEY_ESCAPE
+    PAUSE_KEY = KEY_ESCAPE,
+    HELP_KEY = KEY_F1,
+    RESET_KEY = KEY_R,
+    SHOW_MAP_KEY = KEY_M,
+    MOVE_UP_KEY = KEY_W, // When Changing movement keys keep in mind that the keys should have sinlge character name otherwse they dont display in help menu
+    MOVE_DOWN_KEY = KEY_S,
+    MOVE_LEFT_KEY = KEY_A,
+    MOVE_RIGHT_KEY = KEY_D
 };
 
 int screenWidth = 1600;
@@ -48,6 +56,7 @@ bool shouldDrawFPS = false;
 bool shouldExit = false;
 bool shouldDrawMap = true;
 bool shouldDrawCRTEffect = true;
+bool shouldDisplayHelp = false;
 
 Rectangle rectanglesOfLevel[RectCount][RectCount] = {}, apertureScienceLogoRectangle;
 
@@ -80,6 +89,6 @@ Color TERMINALOUTLINEYELLOW = {159, 121, 25, 255};
 Color TERMINALTEXTGOLD = {255, 185, 9, 255};
 Color TERMINALTEXTGOLD_CRT_ALPHA = {255, 185, 9, 15};
 
-Music mainMenuMusic, creditsMusic, levelMusic[6], CRTBuzzMusic;
+Music mainMenuMusic, creditsMusic, levelMusic[MAX_LEVEL_MUSIC_NUM], CRTBuzzMusic;
 
 Sound splitFlapSound, buttonPressSound, buzzerSound, winSound, CRTOnOffSound;

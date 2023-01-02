@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <time.h>
 #include "maze.h"
 #include "variabledefinitions.h"
 #include "functions.h"
@@ -8,6 +9,12 @@ int main(void)
 {
 	InitWindow(screenWidth, screenHeight, titleText);
 	InitAudioDevice();
+	SetRandomSeed(time(NULL));
+	apertureLogo = LoadTexture("resources/ap_logo.png");
+	apertureScienceLogoRectangle = (Rectangle){0.0f, 0.0f, apertureLogo.width, apertureLogo.height};
+	apertureScienceLogoOrigin = (Vector2){apertureLogo.width / 4, apertureLogo.height / 4};
+	windowIcon = LoadImageFromTexture(apertureLogo);
+	SetWindowIcon(windowIcon);
 
 	mainMenuMusic = LoadMusicStream("resources/MainMenu.mp3");
 	creditsMusic = LoadMusicStream("resources/Credits.mp3");
@@ -19,7 +26,7 @@ int main(void)
 	winSound = LoadSound("resources/WinSound.mp3");
 	CRTOnOffSound = LoadSound("resources/CRTEffect.wav");
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < MAX_LEVEL_MUSIC_NUM; i++)
 	{
 		levelMusic[i] = LoadMusicStream(TextFormat("resources/Music%d.mp3", i + 1));
 	}
@@ -37,13 +44,6 @@ int main(void)
 	SetCameraMode(worldCamera, CAMERA_PERSPECTIVE);
 
 	scanlineShader = LoadShader(0, "resources/scanlines.fs");
-
-	apertureLogo = LoadTexture("resources/ap_logo.png");
-	apertureScienceLogoRectangle = (Rectangle){0.0f, 0.0f, apertureLogo.width, apertureLogo.height};
-	apertureScienceLogoOrigin = (Vector2){apertureLogo.width / 4, apertureLogo.height / 4};
-
-	windowIcon = LoadImageFromTexture(apertureLogo);
-	SetWindowIcon(windowIcon);
 
 	loadLevel(currentLevel);
 
@@ -67,10 +67,9 @@ int main(void)
 
 	PlaySound(splitFlapSound);
 	randomMusic = GetRandomValue(0, 5);
-	SetExitKey(KEY_F4);
-	// Main game loop
+	SetExitKey(KEY_F4 && KEY_LEFT_ALT);
 	PlayMusicStream(CRTBuzzMusic);
-	while (!shouldExit && !WindowShouldClose()) // Detect window close button or ESC key or if Exit is pressed
+	while (!shouldExit && !WindowShouldClose())
 	{
 		switch (layer)
 		{
@@ -97,6 +96,7 @@ int main(void)
 			break;
 		}
 	}
+
 	UnloadShader(scanlineShader);
 	UnloadModel(ballModel);
 	UnloadModel(targetCube);

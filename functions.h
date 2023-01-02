@@ -3,6 +3,41 @@ float getGravity()
     return 100 * GetFrameTime() * 0.98;
 }
 
+void moveBall()
+{
+    if (IsKeyDown(MOVE_UP_KEY))
+    {
+        newPosOrigin.y -= 20 * GetFrameTime();
+    }
+
+    if (IsKeyDown(MOVE_DOWN_KEY))
+    {
+        newPosOrigin.y += 20 * GetFrameTime();
+    }
+
+    if (IsKeyDown(MOVE_RIGHT_KEY))
+    {
+        newPosOrigin.x += 20 * GetFrameTime();
+    }
+
+    if (IsKeyDown(MOVE_LEFT_KEY))
+    {
+        newPosOrigin.x -= 20 * GetFrameTime();
+    }
+
+    newPosOrigin.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
+    newPosOrigin.y += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
+    newPosOrigin.x += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
+    newPosOrigin.y += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
+}
+
+void resetBall()
+{
+    PlayerOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
+    newPosOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
+    ballPosition = ballPositionForLevel;
+}
+
 void loadLevel(int currentLevel)
 {
     for (int i = 0; i < RectCount; i++)
@@ -23,6 +58,9 @@ void loadLevel(int currentLevel)
             }
         }
     }
+    SeekMusicStream(levelMusic[randomMusic], 0.0);
+    SetRandomSeed(time(NULL));
+    randomMusic = GetRandomValue(0, MAX_LEVEL_MUSIC_NUM - 1);
     PlayerOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
     newPosOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
     ballPosition = ballPositionForLevel;
@@ -133,6 +171,12 @@ void drawConsoleOverlay()
         DrawRectangleLinesEx((Rectangle){screenWidth - 580, 12, 100, 45}, 5.0f, TERMINALOUTLINEYELLOW);
         DrawTextEx(consolasFont, TextFormat("%d", GetFPS()), (Vector2){screenWidth - 560, 25}, 25, 0.5, TERMINALTEXTGOLD);
     }
+    if (IsKeyDown(HELP_KEY))
+    {
+        DrawRectangleRec((Rectangle){screenWidth - 910, 12, 320, 160}, TERMINALBROWN);
+        DrawRectangleLinesEx((Rectangle){screenWidth - 910, 12, 320, 160}, 5.0f, TERMINALOUTLINEYELLOW);
+        DrawTextEx(consolasFont, TextFormat("Reset Key: %c\nShow Map: %c\nPause Game: %s\nBall Movement: %s", RESET_KEY, SHOW_MAP_KEY, PAUSE_KEY == KEY_ESCAPE ? "Esc" : TextFormat("%c", PAUSE_KEY), TextFormat("%c%c%c%c", MOVE_UP_KEY, MOVE_LEFT_KEY, MOVE_DOWN_KEY, MOVE_RIGHT_KEY)), (Vector2){screenWidth - 890, 25}, 25, 0.5, TERMINALTEXTGOLD);
+    }
     apertureLogoRotaion += GetFrameTime() * 100; // Ignore Warning
     if (apertureLogoRotaion > 360)
     {
@@ -159,9 +203,17 @@ void drawConsoleOverlay()
     }
 }
 
+void splashScreen()
+{
+    BeginDrawing();
+    ClearBackground(TERMINALBROWN);
+    drawConsoleOverlay();
+    EndDrawing();
+}
+
 void drawMap()
 {
-    if (shouldDrawMap)
+    if (shouldDrawMap || IsKeyDown(SHOW_MAP_KEY))
     {
         DrawRectangleRec((Rectangle){screenWidth - 470, 12, 160, 160}, TERMINALBROWN);
 
@@ -439,37 +491,22 @@ void level()
         PlaySound(buzzerSound);
         layer = PAUSED;
     }
+
+    if (IsKeyPressed(RESET_KEY))
+    {
+        PlayerOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
+        newPosOrigin = (Vector2){ballPositionForLevel.x, ballPositionForLevel.z};
+        ballPosition = ballPositionForLevel;
+    }
+
+    moveBall();
+
     ballPosition.x = PlayerOrigin.x;
     ballPosition.z = PlayerOrigin.y;
     worldCamera.target = ballPosition;
     worldCamera.up.x = 0.0;
     worldCamera.position = (Vector3){ballPosition.x, ballPosition.y + 40, ballPosition.z + 10};
     newPosOrigin = PlayerOrigin;
-
-    if (IsKeyDown(KEY_UP))
-    {
-        newPosOrigin.y -= 20 * GetFrameTime();
-    }
-
-    if (IsKeyDown(KEY_DOWN))
-    {
-        newPosOrigin.y += 20 * GetFrameTime();
-    }
-
-    if (IsKeyDown(KEY_RIGHT))
-    {
-        newPosOrigin.x += 20 * GetFrameTime();
-    }
-
-    if (IsKeyDown(KEY_LEFT))
-    {
-        newPosOrigin.x -= 20 * GetFrameTime();
-    }
-
-    newPosOrigin.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
-    newPosOrigin.y += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
-    newPosOrigin.x += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
-    newPosOrigin.y += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
 
     for (int i = 0; i < RectCount; i++)
     {
@@ -518,17 +555,13 @@ void level()
         if (currentLevel < LEVEL_COUNT)
         {
             loadLevel(currentLevel);
-            SeekMusicStream(levelMusic[randomMusic], 0.0);
             PlaySound(winSound);
-            randomMusic = GetRandomValue(0, 5);
             layer = PLAY_NEXT_LEVEL;
         }
         else
         {
             currentLevel = 0;
             loadLevel(currentLevel);
-            SeekMusicStream(levelMusic[randomMusic], 0.0);
-            randomMusic = GetRandomValue(0, 5);
             PlaySound(winSound);
             layer = WON_SCREEN;
         }
@@ -553,6 +586,7 @@ void level()
     }
     DrawModel(targetCube, (Vector3){154, 2, 152}, 4.0, WHITE);
     EndMode3D();
+
     BeginDrawing();
     drawConsoleOverlay();
     drawMap();
@@ -617,14 +651,15 @@ void creditScreen()
     BeginDrawing();
     ClearBackground(TERMINALBROWN);
 
-    DrawTextEx(consolasFont, "President:\tAhmed Mohiuddin Shah\nCEO:\tAhmed Mohiuddin Shah\nCOO:\tAhmed Mohiuddin Shah\nProducer:\tAhmed Mohiuddin Shah\n\n\nGame/Development Director:\tAhmed Mohiuddin Shah\nProject Leader/Manage:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nOriginal Concept/Idea:\tAhmed Mohiuddin Shah\nDesign Director:\tAhmed Mohiuddin Shah\n\n\nResearch:\tAhmed Mohiuddin Shah\nGame Design:\tAhmed Mohiuddin Shah\nPlanning:\tAhmed Mohiuddin Shah\nProgrammer:\tAhmed Mohiuddin Shah\nEngineer:\tAhmed Mohiuddin Shah\nRendering:\tAhmed Mohiuddin Shah\nPhysics:\tAhmed Mohiuddin Shah\n\n\nBased on game from:\tPortal Series By Valve\n\n\n2D/3D Artist:\tAhmed Mohiuddin Shah\nUI Artist/Graphics:\tAhmed Mohiuddin Shah\nMenu/HUD Graphics:\tAhmed Mohiuddin Shah\nArt Director:\tAhmed Mohiuddin Shah\nVisuals:\tAhmed Mohiuddin Shah\nInterface:\tAhmed Mohiuddin Shah\nConcept:\tAhmed Mohiuddin Shah\nArt:\tAhmed Mohiuddin Shah\nCharacter Design:\tAhmed Mohiuddin Shah\nStoryboard:\tAhmed Mohiuddin Shah\nIllustrationts:\tAhmed Mohiuddin Shah\nModeler:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nEnvironment:\tAhmed Mohiuddin Shah\n\n\nQA Manager:\tAhmed Mohiuddin Shah\nQA Team:\tMy Fellow Hostelites\nPlaytesting Tester:\tAmaan\nPlaytesting Tester:\tAbubakar\nPlaytesting Tester:\tHannan\nPlaytesting Tester:\tHamza\nPlaytesting Tester:\tHaider\n\n\nSpecial Thanks:\tRaysan\nSpecial Thanks:\tSir Jaudat\nSpecial Thanks:\tHamza\nSpecial Thanks:\tMy Parents\n\n\n\nMADE WITH RAYLIB", (Vector2){45, creditsHeight}, 50, 0.5, TERMINALTEXTGOLD);
+    DrawTextEx(consolasFont, "President:\tAhmed Mohiuddin Shah\nCEO:\tAhmed Mohiuddin Shah\nCOO:\tAhmed Mohiuddin Shah\nProducer:\tAhmed Mohiuddin Shah\n\n\nGame/Development Director:\tAhmed Mohiuddin Shah\nProject Leader/Manage:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nOriginal Concept/Idea:\tAhmed Mohiuddin Shah\nDesign Director:\tAhmed Mohiuddin Shah\n\n\nResearch:\tAhmed Mohiuddin Shah\nGame Design:\tAhmed Mohiuddin Shah\nPlanning:\tAhmed Mohiuddin Shah\nProgrammer:\tAhmed Mohiuddin Shah\nEngineer:\tAhmed Mohiuddin Shah\nRendering:\tAhmed Mohiuddin Shah\nPhysics:\tAhmed Mohiuddin Shah\n\n\nBased on game from:\tPortal Series By Valve\n\n\n2D/3D Artist:\tAhmed Mohiuddin Shah\nUI Artist/Graphics:\tAhmed Mohiuddin Shah\nMenu/HUD Graphics:\tAhmed Mohiuddin Shah\nArt Director:\tAhmed Mohiuddin Shah\nVisuals:\tAhmed Mohiuddin Shah\nInterface:\tAhmed Mohiuddin Shah\nConcept:\tAhmed Mohiuddin Shah\nArt:\tAhmed Mohiuddin Shah\nCharacter Design:\tAhmed Mohiuddin Shah\nStoryboard:\tAhmed Mohiuddin Shah\nIllustrationists:\tAhmed Mohiuddin Shah\nModeler:\tAhmed Mohiuddin Shah\nDesign:\tAhmed Mohiuddin Shah\nEnvironment:\tAhmed Mohiuddin Shah\n\n\nQA Manager:\tAhmed Mohiuddin Shah\nQA Team:\tMy Fellow Hostelites and Class Mates\nPlay Tester:\tAmaan\nPlay Tester:\tAbubakar\nPlay Tester:\tHannan\nPlay Tester:\tHamza\nPlay Tester:\tHaider\nPlay Tester:\tHussein\nPlay Tester:\tHammad\nPlay Tester:\tAbdullah\nPlay Tester:\tHaider\n\n\nSpecial Thanks:\tRaysan\nSpecial Thanks:\tSir Jaudat\nSpecial Thanks:\tHamza\nSpecial Thanks:\tMy Parents\n\n\n\nMADE WITH RAYLIB", (Vector2){45, creditsHeight}, 50, 0.5, TERMINALTEXTGOLD);
     DrawRectangle(0, 0, screenWidth, 120, TERMINALBROWN);
     DrawRectangleGradientV(0, 120, screenWidth, screenHeight / 2 - 200, TERMINALBROWN, (Color){0, 0, 0, 0}); // ofset of 80 from center (-80 from 200 to get 120 for center)
     DrawRectangle(0, screenHeight - 150, screenWidth, 150, TERMINALBROWN);
-    DrawRectangleGradientV(0, screenHeight / 2 + 80, screenWidth, screenHeight / 2 - 150, (Color){0, 0, 0, 0}, TERMINALBROWN); // ofset of 80 from center (remove +80 for center)
+    DrawRectangleGradientV(0, screenHeight / 2, screenWidth, screenHeight / 2 - 150, (Color){0, 0, 0, 0}, TERMINALBROWN); // ofset of 80 from center (remove +80 for center)
     DrawTextEx(consolasFont, "CREDITS", (Vector2){45, 30}, 100, 0.5, TERMINALTEXTGOLD);
     DrawTextEx(consolasFont, "Main Menu", (Vector2){45, screenHeight - 140}, 50, 0.5, CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}) ? TERMINALOUTLINEYELLOW : TERMINALTEXTGOLD);
     drawBlinkingCursor(310, screenHeight - 140);
+
     if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){45, screenHeight - 140, 260, 50}))
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -635,6 +670,14 @@ void creditScreen()
             layer = MAIN_MENU;
         }
     }
+
+    if (GetMusicTimePlayed(creditsMusic) > GetMusicTimeLength(creditsMusic) - 1)
+    {
+        creditsHeight = screenHeight - 140;
+        SeekMusicStream(creditsMusic, 0.0);
+        layer = MAIN_MENU;
+    }
+
     if (creditsHeight < -4200)
     {
         creditsHeight = screenHeight - 140;
