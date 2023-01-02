@@ -206,15 +206,28 @@ void drawConsoleOverlay()
 
 void splashScreen()
 {
-    while (GetTime() < 20)
+    while (GetTime() < 15)
     {
         PlayMusicStream(mainMenuMusic);
         UpdateMusicStream(mainMenuMusic);
         BeginDrawing();
         ClearBackground(TERMINALBROWN);
         apertureLogoRotaion += GetFrameTime() * 100; // To make logo go faster
+        if (apertureLogoRotaion > 360)
+        {
+            apertureLogoRotaion = 0;
+        }
+
+        dotLimit++;
+        if (dotLimit > 60)
+        {
+            strcat(loadingDots, ".");
+            dotLimit = 0;
+        }
+
         // Enable if you want aperture logo
         // DrawTexturePro(apertureLogo, apertureScienceLogoRectangle, (Rectangle){screenWidth / 2.0f + apertureLogoGoToCorner.x, screenHeight / 2.0f - apertureLogoGoToCorner.y, apertureScienceLogoOrigin.x * 4, apertureScienceLogoOrigin.y * 4}, (Vector2){apertureScienceLogoOrigin.x * 2, apertureScienceLogoOrigin.y * 2}, apertureLogoRotaion, WHITE);
+        DrawTextEx(consolasFont, TextFormat("Loading%s", loadingDots), (Vector2){45, screenHeight - 175}, 35, 0.5, TERMINALTEXTGOLD);
         DrawTextEx(consolasFont, "Hold F1 to show help menu while solving mazes", (Vector2){45, screenHeight - 140}, 35, 0.5, TERMINALTEXTGOLD);
         drawBlinkingCursor(925, screenHeight - 145);
         drawConsoleOverlay();

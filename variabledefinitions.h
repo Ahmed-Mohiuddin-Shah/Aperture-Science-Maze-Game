@@ -52,6 +52,9 @@ char titleTextASCII[] = "Maze Testing\nInitiative";
 float Radius = 1.0;
 float apertureLogoRotaion = 0;
 
+char loadingDots[20] = "";
+int dotLimit = 0;
+
 bool shouldDrawFPS = false;
 bool shouldExit = false;
 bool shouldDrawMap = true;

@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <time.h>
+#include <string.h>
 #include "maze.h"
 #include "variabledefinitions.h"
 #include "functions.h"
