@@ -35,6 +35,7 @@ unsigned int layer = MAIN_MENU;
 unsigned int previousLayer = 0;
 unsigned int currentLevel = 0;
 unsigned int cursorBlinkCounter = 0;
+unsigned int randomLinePosition = 0;
 
 int creditsHeight = 120;
 int crtEffectRectangleHeight = -constScreenHeight;
@@ -52,7 +53,7 @@ char titleTextASCII[] = "Maze Testing\nInitiative";
 float Radius = 1.0;
 float apertureLogoRotaion = 0;
 
-char loadingDots[20] = "";
+char loadingDots[30] = "";
 int dotLimit = 0;
 
 bool shouldDrawFPS = false;

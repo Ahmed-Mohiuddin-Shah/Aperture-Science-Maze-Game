@@ -197,6 +197,10 @@ void drawConsoleOverlay()
         crtEffectRectangleHeight += GetFrameTime() * 1000;
         DrawRectangleGradientV(0, crtEffectRectangleHeight, screenWidth, screenHeight / 2, (Color){TERMINALTEXTGOLD_CRT_ALPHA.r, TERMINALTEXTGOLD_CRT_ALPHA.g, TERMINALTEXTGOLD_CRT_ALPHA.b, 0}, TERMINALTEXTGOLD_CRT_ALPHA);
 
+        randomLinePosition = GetRandomValue(0, screenHeight);
+
+        DrawRectangle(0, randomLinePosition, screenWidth, 5, TERMINALTEXTGOLD_CRT_ALPHA);
+
         BeginShaderMode(scanlineShader);
         // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
         DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)-target.texture.height}, (Vector2){0, 0}, WHITE);
@@ -206,7 +210,7 @@ void drawConsoleOverlay()
 
 void splashScreen()
 {
-    while (GetTime() < 15)
+    while (GetTime() < 20)
     {
         PlayMusicStream(mainMenuMusic);
         UpdateMusicStream(mainMenuMusic);
@@ -219,7 +223,7 @@ void splashScreen()
         }
 
         dotLimit++;
-        if (dotLimit > FPS/2)
+        if (dotLimit > FPS / 2)
         {
             strcat(loadingDots, ".");
             dotLimit = 0;
@@ -354,6 +358,7 @@ void settingsMenu()
             ToggleFullscreen();
             screenWidth = GetScreenWidth();
             screenHeight = GetScreenHeight();
+            SetWindowSize(screenWidth, screenHeight);
         }
     }
     ////////////////////////////
