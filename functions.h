@@ -499,14 +499,14 @@ void level()
         ballPosition = ballPositionForLevel;
     }
 
-    moveBall();
-
     ballPosition.x = PlayerOrigin.x;
     ballPosition.z = PlayerOrigin.y;
     worldCamera.target = ballPosition;
     worldCamera.up.x = 0.0;
     worldCamera.position = (Vector3){ballPosition.x, ballPosition.y + 40, ballPosition.z + 10};
     newPosOrigin = PlayerOrigin;
+
+    moveBall();
 
     for (int i = 0; i < RectCount; i++)
     {
