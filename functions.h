@@ -219,7 +219,7 @@ void splashScreen()
         }
 
         dotLimit++;
-        if (dotLimit > 60)
+        if (dotLimit > FPS/2)
         {
             strcat(loadingDots, ".");
             dotLimit = 0;
