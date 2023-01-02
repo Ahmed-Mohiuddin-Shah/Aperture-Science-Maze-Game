@@ -171,10 +171,11 @@ void drawConsoleOverlay()
         DrawRectangleLinesEx((Rectangle){screenWidth - 580, 12, 100, 45}, 5.0f, TERMINALOUTLINEYELLOW);
         DrawTextEx(consolasFont, TextFormat("%d", GetFPS()), (Vector2){screenWidth - 560, 25}, 25, 0.5, TERMINALTEXTGOLD);
     }
-    if (IsKeyDown(HELP_KEY))
+    if (IsKeyDown(HELP_KEY) && layer == LEVEL)
     {
         DrawRectangleRec((Rectangle){screenWidth - 910, 12, 320, 160}, TERMINALBROWN);
         DrawRectangleLinesEx((Rectangle){screenWidth - 910, 12, 320, 160}, 5.0f, TERMINALOUTLINEYELLOW);
+        // Ignore Warning
         DrawTextEx(consolasFont, TextFormat("Reset Key: %c\nShow Map: %c\nPause Game: %s\nBall Movement: %s", RESET_KEY, SHOW_MAP_KEY, PAUSE_KEY == KEY_ESCAPE ? "Esc" : TextFormat("%c", PAUSE_KEY), TextFormat("%c%c%c%c", MOVE_UP_KEY, MOVE_LEFT_KEY, MOVE_DOWN_KEY, MOVE_RIGHT_KEY)), (Vector2){screenWidth - 890, 25}, 25, 0.5, TERMINALTEXTGOLD);
     }
     apertureLogoRotaion += GetFrameTime() * 100; // Ignore Warning
@@ -205,10 +206,20 @@ void drawConsoleOverlay()
 
 void splashScreen()
 {
-    BeginDrawing();
-    ClearBackground(TERMINALBROWN);
-    drawConsoleOverlay();
-    EndDrawing();
+    while (GetTime() < 20)
+    {
+        PlayMusicStream(mainMenuMusic);
+        UpdateMusicStream(mainMenuMusic);
+        BeginDrawing();
+        ClearBackground(TERMINALBROWN);
+        apertureLogoRotaion += GetFrameTime() * 100; // To make logo go faster
+        // Enable if you want aperture logo
+        // DrawTexturePro(apertureLogo, apertureScienceLogoRectangle, (Rectangle){screenWidth / 2.0f + apertureLogoGoToCorner.x, screenHeight / 2.0f - apertureLogoGoToCorner.y, apertureScienceLogoOrigin.x * 4, apertureScienceLogoOrigin.y * 4}, (Vector2){apertureScienceLogoOrigin.x * 2, apertureScienceLogoOrigin.y * 2}, apertureLogoRotaion, WHITE);
+        DrawTextEx(consolasFont, "Hold F1 to show help menu while solving mazes", (Vector2){45, screenHeight - 140}, 35, 0.5, TERMINALTEXTGOLD);
+        drawBlinkingCursor(925, screenHeight - 145);
+        drawConsoleOverlay();
+        EndDrawing();
+    }
 }
 
 void drawMap()

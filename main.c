@@ -69,6 +69,7 @@ int main(void)
 	randomMusic = GetRandomValue(0, 5);
 	SetExitKey(KEY_F4 && KEY_LEFT_ALT);
 	PlayMusicStream(CRTBuzzMusic);
+	splashScreen();
 	while (!shouldExit && !WindowShouldClose())
 	{
 		switch (layer)
