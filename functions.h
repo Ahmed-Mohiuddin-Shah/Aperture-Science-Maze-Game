@@ -374,8 +374,8 @@ void settingsMenu()
         {
             PlaySound(buttonPressSound);
             ToggleFullscreen();
-            // screenWidth = GetScreenWidth();
-            // screenHeight = GetScreenHeight();           // Enable Afterwards
+            screenWidth = GetScreenWidth();
+            screenHeight = GetScreenHeight(); // Enable Afterwards
             // SetWindowSize(screenWidth, screenHeight);
         }
     }
