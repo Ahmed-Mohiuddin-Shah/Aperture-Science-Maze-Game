@@ -5,30 +5,48 @@ float getGravity()
 
 void moveBall()
 {
+    ballRotation.x = ballRotation.x == 360 ? 0 : ballRotation.x;
+    ballRotation.z = ballRotation.z == 360 ? 0 : ballRotation.z;
     if (IsKeyDown(MOVE_UP_KEY))
     {
         newPosOrigin.y -= 20 * GetFrameTime();
+        ballRotation.x -= 200 * GetFrameTime();
     }
 
     if (IsKeyDown(MOVE_DOWN_KEY))
     {
         newPosOrigin.y += 20 * GetFrameTime();
+        ballRotation.x += 200 * GetFrameTime();
+        ;
     }
 
     if (IsKeyDown(MOVE_RIGHT_KEY))
     {
         newPosOrigin.x += 20 * GetFrameTime();
+        ballRotation.z -= 200 * GetFrameTime();
+        ;
     }
 
     if (IsKeyDown(MOVE_LEFT_KEY))
     {
         newPosOrigin.x -= 20 * GetFrameTime();
+        ballRotation.z += 200 * GetFrameTime();
+        ;
     }
 
     newPosOrigin.x += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
     newPosOrigin.y += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
     newPosOrigin.x += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_X) * (25 * GetFrameTime());
     newPosOrigin.y += GetGamepadAxisMovement(1, GAMEPAD_AXIS_LEFT_Y) * (25 * GetFrameTime());
+
+    rlPushMatrix();
+    rlRotatef(ballRotation.x, 1, 0, 0);
+    rlRotatef(ballRotation.z, 0, 0, 1);
+    rlTranslatef(0, 0, -0.5);
+
+    ballModel.transform = rlGetMatrixTransform();
+
+    rlPopMatrix();
 }
 
 void resetBall()
@@ -210,7 +228,7 @@ void drawConsoleOverlay()
 
 void splashScreen()
 {
-    while (GetTime() < 20)
+    while (GetTime() < 10)
     {
         PlayMusicStream(mainMenuMusic);
         UpdateMusicStream(mainMenuMusic);
@@ -356,9 +374,9 @@ void settingsMenu()
         {
             PlaySound(buttonPressSound);
             ToggleFullscreen();
-            screenWidth = GetScreenWidth();
-            screenHeight = GetScreenHeight();
-            SetWindowSize(screenWidth, screenHeight);
+            // screenWidth = GetScreenWidth();
+            // screenHeight = GetScreenHeight();           // Enable Afterwards
+            // SetWindowSize(screenWidth, screenHeight);
         }
     }
     ////////////////////////////
@@ -513,7 +531,6 @@ void level()
 {
     PlayMusicStream(levelMusic[randomMusic]);
     UpdateMusicStream(levelMusic[randomMusic]);
-    ballRotation = (Vector2){0, 0};
     if (IsKeyPressed(PAUSE_KEY))
     {
         ShowCursor();
@@ -602,7 +619,7 @@ void level()
     ClearBackground(TERMINALBROWN);
     DrawModelEx(
         floorModel, (Vector3){80.0, 0.0, 80.0}, (Vector3){1.0, 0.0, 0.0}, 90, (Vector3){4.0, 4.0, 0.0}, WHITE);
-    DrawModel(ballModel, (Vector3){ballPosition.x, ballPosition.y + 1, ballPosition.z - 1}, 2.0, WHITE);
+    DrawModel(ballModel, (Vector3){ballPosition.x, ballPosition.y + 1, ballPosition.z}, 2.0, WHITE);
     for (int i = 0; i < RectCount; i++)
     {
         for (int j = 0; j < 40; j++)

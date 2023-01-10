@@ -15,6 +15,7 @@
 		"functions.h": "c",
 		"variabledefinitions.h": "c",
 		"system_error": "c",
-		"raylib.h": "c"
+		"raylib.h": "c",
+		"time.h": "c"
 	}
 }

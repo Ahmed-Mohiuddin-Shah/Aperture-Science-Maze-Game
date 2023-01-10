@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <rlgl.h>
 #include <time.h>
 #include <string.h>
 #include "maze.h"
@@ -10,7 +11,7 @@ int main(void)
 {
 	InitWindow(screenWidth, screenHeight, titleText);
 	InitAudioDevice();
-	ToggleFullscreen();
+	// ToggleFullscreen(); Enable Afterwards
 	SetRandomSeed(time(NULL));
 	apertureLogo = LoadTexture("resources/ap_logo.png");
 	apertureScienceLogoRectangle = (Rectangle){0.0f, 0.0f, apertureLogo.width, apertureLogo.height};

@@ -82,10 +82,10 @@ Shader scanlineShader;
 Vector2 newPosOrigin;
 Vector2 apertureScienceLogoOrigin;
 Vector2 PlayerOrigin = {0, 0};
-Vector2 ballRotation = {0, 0};
 Vector2 apertureLogoGoToCorner = {0, 0};
 
 Vector3 ballPosition = {0, 2.5, 0};
+Vector3 ballRotation = {0, 1, 0};
 
 Font consolasFont;
 
